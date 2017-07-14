@@ -3,8 +3,10 @@ package de.konstanz.schulen.suso;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,11 +19,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,33 +82,21 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
 
 
-        SharedPreferences.Editor editor =sharedPreferences.edit();
-        editor.remove(SUBSTITUTION_PLAN_DATA_KEY);
-        editor.commit();
-        updateSubstitutionplan("EbertDan", "qatze2");
+
     }
 
 
     @Override
-    protected void onResume(){
-        super.onResume();
-
-        //substitutionplanRecyclerView.setHasFixedSize(true);
-        /*substitutionplanRecyclerView1.setLayoutManager(new LinearLayoutManager(substitutionplanRecyclerView1.getContext()){
-            @Override
-            public boolean canScrollVertically(){
-                return false;
-            }
-        });
-        substitutionplanRecyclerView2.setLayoutManager(new LinearLayoutManager(substitutionplanRecyclerView2.getContext()){
-            @Override
-            public boolean canScrollVertically(){
-                return false;
-            }
-        });*/
-
-
+    public void onStart(){
+        super.onStart();
+        String savedSubstitutionplanData = sharedPreferences.getString(SUBSTITUTION_PLAN_DATA_KEY, "");
+        if (savedSubstitutionplanData != "") {
+            displaySubstitutionplan(savedSubstitutionplanData);
+        }
+        //TODO Add login UI
+        updateSubstitutionplan("EbertDan", "qatze2");
     }
+
 
     @Override
     public void onBackPressed() {
@@ -175,10 +165,11 @@ public class MainActivity extends AppCompatActivity
 
     private void updateSubstitutionplan(String username, String password){
         PendingIntent pendingResult = createPendingResult(INTENT_REQUEST_UPDATE_SUBSTPLAN, new Intent(), 0);
-        Intent intent = new Intent(this, DownloadStringIntentService.class);
+        Intent intent = new Intent(getApplicationContext(), DownloadStringIntentService.class);
         intent.putExtra(DownloadStringIntentService.USERNAME_EXTRA, username);
         intent.putExtra(DownloadStringIntentService.PASSWORD_EXTRA, password);
         intent.putExtra(DownloadStringIntentService.RESULT_INTENT_NAME, pendingResult);
+
         startService(intent);
     }
 
@@ -194,9 +185,12 @@ public class MainActivity extends AppCompatActivity
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(SUBSTITUTION_PLAN_DATA_KEY, json);
                     editor.commit();
-
                     displaySubstitutionplan(json);
+
                 }
+            }else if(resultCode==DownloadStringIntentService.ERROR_CODE){
+                Toast errorToast = Toast.makeText(MainActivity.this, "Unable to download latest data. Please check your network connection.", Toast.LENGTH_SHORT);
+                errorToast.show();
             }
         }
 
@@ -275,6 +269,7 @@ public class MainActivity extends AppCompatActivity
                 recyclerView.setAdapter(adapter);
 
                 TextView dateView = new TextView(substitutionplanContent.getContext());
+                dateView.setGravity(Gravity.CENTER);
                 dateView.setText(dateString);
 
                 substitutionplanContent.addView(dateView);

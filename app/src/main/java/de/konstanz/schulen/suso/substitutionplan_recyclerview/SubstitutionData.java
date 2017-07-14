@@ -1,6 +1,8 @@
 package de.konstanz.schulen.suso.substitutionplan_recyclerview;
 
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,8 +18,8 @@ public class SubstitutionData{
 
 
     public SubstitutionData(JSONObject jsonData) throws JSONException {
-        subject = jsonData.getString("subject") + ' ';
-        teacher = jsonData.getString("teacher") + ' ';
+        subject = jsonData.getString("subject");
+        teacher = jsonData.getString("teacher");
         subTeacher = jsonData.getString("subteacher");
         subSubject = jsonData.getString("subsubject");
         subRoom = jsonData.getString("subroom");
@@ -25,9 +27,18 @@ public class SubstitutionData{
         comment = jsonData.getString("comment");
         hour = jsonData.getString("hour");
 
+        /*
+        If subject or teacher stay the same, show now crossed-out text, else add a space between
+        the crossed-out and the new text
+         */
         if(subSubject.equalsIgnoreCase(subject)) subject = "";
+        else subject = subject + ' ';
         if(subTeacher.equalsIgnoreCase(teacher)) teacher = "";
+        else teacher = teacher + ' ';
 
+        /*
+        Display no text instead of 3 bars for a clear field
+         */
         if(subTeacher.equals("---")) subTeacher = "";
         if(subSubject.equals("---")) subSubject = "";
         if(subRoom.equals("---")) subRoom = "";

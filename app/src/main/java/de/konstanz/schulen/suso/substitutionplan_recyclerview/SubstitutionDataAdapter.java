@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,8 +86,8 @@ public class SubstitutionDataAdapter extends RecyclerView.Adapter{
 
             int subjectIndex = teacherEnd + data.getSubTeacher().length() + 7;
             int subjectEnd = subjectIndex + data.getSubject().length();
-            spannable.setSpan(new StrikethroughSpan(), teacherIndex, teacherEnd-1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new StrikethroughSpan(), subjectIndex, subjectEnd-1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if(!data.getTeacher().isEmpty()) spannable.setSpan(new StrikethroughSpan(), teacherIndex, teacherEnd-1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if(!data.getSubject().isEmpty()) spannable.setSpan(new StrikethroughSpan(), subjectIndex, subjectEnd-1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 }

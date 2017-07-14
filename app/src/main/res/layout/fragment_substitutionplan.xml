@@ -2,19 +2,20 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:padding="@dimen/none"
+             android:padding="0dp"
              tools:context="de.konstanz.schulen.suso.SubstitutionplanFragment">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/none">
+        android:padding="0dp">
 
         <LinearLayout
             android:id="@+id/content_substitutionplan"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="0dp">
 
         </LinearLayout>
 
