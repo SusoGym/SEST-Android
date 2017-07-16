@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity
 
     public static final int INTENT_REQUEST_UPDATE_SUBSTPLAN = 1;
     public static final String SUBSTITUTION_PLAN_DATA_KEY = "substitution_json";
+    public static final String USERNAME_KEY = "nov_username";
+    public static final String PASSWORD_KEY = "nov_password";
 
     DrawerLayout navigationDrawer;
     FragmentManager fragmentManager;
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
 
 
         //Add the view fragment
