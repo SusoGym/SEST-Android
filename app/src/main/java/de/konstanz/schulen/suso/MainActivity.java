@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
     public void onStart(){
         super.onStart();
         String savedSubstitutionplanData = sharedPreferences.getString(SUBSTITUTION_PLAN_DATA_KEY, "");
-        if (savedSubstitutionplanData != "") {
+        if (!savedSubstitutionplanData.equals("")) {
             displaySubstitutionplan(savedSubstitutionplanData);
         }
         //TODO Add login UI
@@ -224,8 +224,8 @@ public class MainActivity extends AppCompatActivity
                  */
                 String dateString;
                 {
-                    DateFormat readFormat = new SimpleDateFormat("yyyyLLdd");
-                    DateFormat writeFormat = new SimpleDateFormat("d.L.yyyy");
+                    DateFormat readFormat = new SimpleDateFormat("yyyyMMdd");
+                    DateFormat writeFormat = new SimpleDateFormat("dd.MM.yyyy");
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(readFormat.parse(dateKey));
 
