@@ -23,6 +23,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +51,10 @@ public class MainActivity extends AppCompatActivity
     public static final String SUBSTITUTION_PLAN_DATA_KEY = "substitution_json";
     public static final String USERNAME_KEY = "nov_username";
     public static final String PASSWORD_KEY = "nov_password";
+
+    //TODO TEST
+    private String username = "EbertDan";
+    private String password = "qatze2";
 
     DrawerLayout navigationDrawer;
     FragmentManager fragmentManager;
@@ -87,18 +92,25 @@ public class MainActivity extends AppCompatActivity
 
 
 
+        Button toolbarRefresh = (Button) findViewById(R.id.toolbar_refresh);
+        toolbarRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(currentFragment instanceof SubstitutionplanFragment){
+                    updateSubstitutionplan(username, password);
+                }
+            }
+        });
+
+
+
     }
 
 
     @Override
     public void onStart(){
         super.onStart();
-        String savedSubstitutionplanData = sharedPreferences.getString(SUBSTITUTION_PLAN_DATA_KEY, "");
-        if (!savedSubstitutionplanData.equals("")) {
-            displaySubstitutionplan(savedSubstitutionplanData);
-        }
-        //TODO Add login UI
-        updateSubstitutionplan("EbertDan", "qatze2");
+        showSubstitutionplan();
     }
 
 
@@ -139,6 +151,7 @@ public class MainActivity extends AppCompatActivity
         if(id==R.id.nav_vertretungsplan){
             if(!(currentFragment instanceof SubstitutionplanFragment)){
                 setViewFragment(new SubstitutionplanFragment());
+                showSubstitutionplan();
             }
         }else if(id==R.id.nav_blog){
             if(!(currentFragment instanceof BlogFragment)){
@@ -159,6 +172,7 @@ public class MainActivity extends AppCompatActivity
         transaction.replace(R.id.content_main, currentFragment);
         //TODO Optionally add to the back stack to make menu navigation reversible
         transaction.commit();
+        fragmentManager.executePendingTransactions();
     }
 
     @Override
@@ -166,6 +180,15 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
+    private void showSubstitutionplan(){
+        String savedSubstitutionplanData = sharedPreferences.getString(SUBSTITUTION_PLAN_DATA_KEY, "");
+        if (!savedSubstitutionplanData.equals("")) {
+            displaySubstitutionplan(savedSubstitutionplanData);
+        }
+        //TODO Add login UI
+        updateSubstitutionplan(username, password);
+    }
 
     private void updateSubstitutionplan(String username, String password){
         PendingIntent pendingResult = createPendingResult(INTENT_REQUEST_UPDATE_SUBSTPLAN, new Intent(), 0);
