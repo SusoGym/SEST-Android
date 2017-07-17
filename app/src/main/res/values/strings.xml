@@ -9,8 +9,6 @@
 
     <string name="preference_file_key">de.konstanz.schulen.suso.data</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="day_monday">Montag</string>
     <string name="day_tuesday">Dienstag</string>
@@ -25,19 +23,11 @@
     <string name="substcard_subject">Fach: </string>
     <string name="substcard_room">Raum: </string>
     <string name="substcard_comment">Kommentar: </string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">Anmelden</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="substplan_network_error">Vertretungsplan konnte nicht heruntergeladen werden. Bitte überprüfe deine Internetverbinung</string>
+    <string name ="substplan_json_error">Fehler beim Auslesen des Vertretungsplans (JSON). Daten sind möglicherweise unvollständig oder fehlerhaft</string>
+    <string name="login_invalid_data">Benutzername oder Passwort ungültig</string>
+    <string name="login_network_error">Fehler bei der Anmeldung. Bitte überprüfe deine Internetverbindung</string>
 
 </resources>

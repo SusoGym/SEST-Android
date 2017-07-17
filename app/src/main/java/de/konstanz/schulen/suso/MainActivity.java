@@ -21,7 +21,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        Button toolbarRefresh = (Button) findViewById(R.id.toolbar_refresh);
+        ImageButton toolbarRefresh = (ImageButton) findViewById(R.id.toolbar_refresh);
         toolbarRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity
 
         if(sharedPreferences.getString(USERNAME_KEY, null)==null){
             Intent startLogin = new Intent(MainActivity.this, LoginActivity.class);
+            startLogin.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             startActivity(startLogin);
             return;
         }
@@ -227,7 +228,7 @@ public class MainActivity extends AppCompatActivity
 
                 }
             }else if(resultCode==DownloadStringIntentService.ERROR_CODE){
-                Toast errorToast = Toast.makeText(MainActivity.this, "Unable to download latest data. Please check your network connection.", Toast.LENGTH_SHORT);
+                Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT);
                 errorToast.show();
             }
         }
@@ -315,10 +316,10 @@ public class MainActivity extends AppCompatActivity
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast errorToast = Toast.makeText(MainActivity.this, "Error at reading subsitutionplan (JSON). Data may not be displayed correctly", Toast.LENGTH_LONG);
+            Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
             errorToast.show();
         } catch (ParseException e) {
-            Toast errorToast = Toast.makeText(MainActivity.this, "Error at reading subsitutionplan dates (JSON). Data may not be displayed correctly", Toast.LENGTH_LONG);
+            Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
             errorToast.show();
         }
 

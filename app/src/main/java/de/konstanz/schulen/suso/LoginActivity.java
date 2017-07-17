@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         if(requestCode== DownloadStringIntentService.INTENT_REQUEST_UPDATE_SUBSTPLAN){
             if(resultCode==DownloadStringIntentService.SUCCESSFUL_CODE){
                 if(data.getStringExtra(DownloadStringIntentService.RESULT_EXTRA).contains("Invalid userdata!")){
-                    Toast errorToast = Toast.makeText(LoginActivity.this, "Benutzername oder Passwort ungültig.", Toast.LENGTH_SHORT);
+                    Toast errorToast = Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_invalid_data), Toast.LENGTH_SHORT);
                     errorToast.show();
                 }else{
 
@@ -58,10 +58,11 @@ public class LoginActivity extends AppCompatActivity {
                     editor.commit();
 
                     Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                     startActivity(intent);
                 }
             }else if(resultCode==DownloadStringIntentService.ERROR_CODE){
-                Toast errorToast = Toast.makeText(LoginActivity.this, "Fehler bei der Anmeldung. Bitte überprüfe deine Internetverbindung.", Toast.LENGTH_SHORT);
+                Toast errorToast = Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_network_error), Toast.LENGTH_SHORT);
                 errorToast.show();
             }
         }
