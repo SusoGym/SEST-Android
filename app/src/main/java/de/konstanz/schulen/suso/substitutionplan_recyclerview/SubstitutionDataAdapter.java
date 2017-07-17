@@ -72,7 +72,6 @@ public class SubstitutionDataAdapter extends RecyclerView.Adapter{
         }
 
         void initialize(SubstitutionData data){
-            //TODO Create textview content
             textView.setText(HOUR + data.getHour() + "\n" +
                             TEACHER + data.getTeacher() + data.getSubTeacher() + '\n' +
                             SUBJECT + data.getSubject() + data.getSubSubject() + '\n' +

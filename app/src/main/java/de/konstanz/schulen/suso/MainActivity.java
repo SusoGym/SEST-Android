@@ -3,10 +3,8 @@ package de.konstanz.schulen.suso;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,29 +45,33 @@ import de.konstanz.schulen.suso.substitutionplan_recyclerview.SubstitutionDataAd
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, BlogFragment.OnFragmentInteractionListener, SubstitutionplanFragment.OnFragmentInteractionListener{
 
-    public static final int INTENT_REQUEST_UPDATE_SUBSTPLAN = 1;
     public static final String SUBSTITUTION_PLAN_DATA_KEY = "substitution_json";
     public static final String USERNAME_KEY = "nov_username";
     public static final String PASSWORD_KEY = "nov_password";
 
     //TODO TEST
-    private String username = "EbertDan";
-    private String password = "qatze2";
+    private String username;
+    private String password;
 
     DrawerLayout navigationDrawer;
     FragmentManager fragmentManager;
     Fragment currentFragment;
-    SharedPreferences sharedPreferences;
+    public static SharedPreferences sharedPreferences;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
 
         navigationDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -110,6 +112,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStart(){
         super.onStart();
+
+        if(sharedPreferences.getString(USERNAME_KEY, null)==null){
+            Intent startLogin = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(startLogin);
+            return;
+        }
+
+        username = sharedPreferences.getString(USERNAME_KEY, null);
+        password = sharedPreferences.getString(PASSWORD_KEY, null);
+
         showSubstitutionplan();
     }
 
@@ -170,7 +182,6 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         currentFragment = fragment;
         transaction.replace(R.id.content_main, currentFragment);
-        //TODO Optionally add to the back stack to make menu navigation reversible
         transaction.commit();
         fragmentManager.executePendingTransactions();
     }
@@ -191,7 +202,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateSubstitutionplan(String username, String password){
-        PendingIntent pendingResult = createPendingResult(INTENT_REQUEST_UPDATE_SUBSTPLAN, new Intent(), 0);
+        PendingIntent pendingResult = createPendingResult(DownloadStringIntentService.INTENT_REQUEST_UPDATE_SUBSTPLAN, new Intent(), 0);
         Intent intent = new Intent(getApplicationContext(), DownloadStringIntentService.class);
         intent.putExtra(DownloadStringIntentService.USERNAME_EXTRA, username);
         intent.putExtra(DownloadStringIntentService.PASSWORD_EXTRA, password);
@@ -202,7 +213,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(requestCode== INTENT_REQUEST_UPDATE_SUBSTPLAN){
+        if(requestCode== DownloadStringIntentService.INTENT_REQUEST_UPDATE_SUBSTPLAN){
             if(resultCode==DownloadStringIntentService.SUCCESSFUL_CODE){
                 //Executed after the substitution plan has successfully been downloaded
                 String json = data.getStringExtra(DownloadStringIntentService.RESULT_EXTRA);
@@ -231,7 +242,6 @@ public class MainActivity extends AppCompatActivity
         try {
             JSONObject jsonObject = new JSONObject(json);
             JSONObject coverLessons = jsonObject.getJSONObject("coverlessons");
-            //TODO The order of the days might not be correct
             Iterator<String> substitutionDays = coverLessons.keys();
             //Iterate over the days
             while(substitutionDays.hasNext()){

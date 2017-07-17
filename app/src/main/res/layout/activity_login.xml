@@ -18,14 +18,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:textColor="#000000"/>
 
         <EditText
             android:id="@+id/edittext_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:textColor="#000000"/>
 
         <Button
             android:id="@+id/button_login"

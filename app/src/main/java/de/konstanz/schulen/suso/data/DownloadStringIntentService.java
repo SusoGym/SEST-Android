@@ -18,6 +18,7 @@ public class DownloadStringIntentService extends IntentService {
     public static final String RESULT_EXTRA = "substitution_plan";
     public static final int SUCCESSFUL_CODE = 0;
     public static final int ERROR_CODE = -1;
+    public static final int INTENT_REQUEST_UPDATE_SUBSTPLAN = 1;
 
     public DownloadStringIntentService() {
         super(NAME);
