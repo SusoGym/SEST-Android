@@ -25,6 +25,8 @@
     <string name="substcard_comment">Kommentar: </string>
     <string name="title_activity_login">Anmelden</string>
 
+    <string name="no_substitutions">Keine Vertretungen</string>
+
     <string name="substplan_network_error">Vertretungsplan konnte nicht heruntergeladen werden. Bitte überprüfe deine Internetverbinung</string>
     <string name ="substplan_json_error">Fehler beim Auslesen des Vertretungsplans (JSON). Daten sind möglicherweise unvollständig oder fehlerhaft</string>
     <string name="login_invalid_data">Benutzername oder Passwort ungültig</string>

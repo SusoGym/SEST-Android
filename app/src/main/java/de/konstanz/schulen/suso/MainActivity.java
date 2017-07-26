@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -237,6 +238,7 @@ public class MainActivity extends AppCompatActivity
 
 
     private void displaySubstitutionplan(String json){
+
         LinearLayout substitutionplanContent = (LinearLayout) findViewById(R.id.content_substitutionplan);
         substitutionplanContent.removeAllViews();
 
@@ -316,12 +318,20 @@ public class MainActivity extends AppCompatActivity
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
-            errorToast.show();
+            if(e.getMessage().contains("coverlessons of type org.json.JSONArray cannot be converted to JSONObject")) {
+                TextView infoView = new TextView(substitutionplanContent.getContext());
+                infoView.setGravity(Gravity.CENTER);
+                infoView.setText(R.string.no_substitutions);
+                substitutionplanContent.addView(infoView);
+            }else{
+                Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
+                errorToast.show();
+            }
         } catch (ParseException e) {
             Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
             errorToast.show();
         }
+
 
     }
 }
