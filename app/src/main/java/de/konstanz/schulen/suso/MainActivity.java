@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentManager;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -106,12 +108,33 @@ public class MainActivity extends AppCompatActivity
         });
 
 
+        toolbarRefresh.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        v.getBackground().setColorFilter(0xa0FFFFFF, PorterDuff.Mode.SRC_ATOP);
+                        v.invalidate();
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        v.getBackground().clearColorFilter();
+                        v.invalidate();
+                        break;
+                    }
+                }
+                return false;
+            }
+        });
+
+
 
     }
 
 
     @Override
     public void onStart(){
+
         super.onStart();
 
         if(sharedPreferences.getString(USERNAME_KEY, null)==null){
@@ -166,10 +189,6 @@ public class MainActivity extends AppCompatActivity
             if(!(currentFragment instanceof SubstitutionplanFragment)){
                 setViewFragment(new SubstitutionplanFragment());
                 showSubstitutionplan();
-            }
-        }else if(id==R.id.nav_blog){
-            if(!(currentFragment instanceof BlogFragment)){
-                setViewFragment(new BlogFragment());
             }
         }
 
@@ -227,12 +246,15 @@ public class MainActivity extends AppCompatActivity
                     editor.commit();
                     displaySubstitutionplan(json);
 
+
                 }
             }else if(resultCode==DownloadStringIntentService.ERROR_CODE){
                 Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT);
                 errorToast.show();
             }
         }
+
+
 
     }
 
