@@ -9,6 +9,10 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+
+import de.konstanz.schulen.suso.BuildConfig;
+import de.konstanz.schulen.suso.R;
 
 public class DownloadStringIntentService extends IntentService {
     public static final String NAME = DownloadStringIntentService.class.getSimpleName();
@@ -32,17 +36,34 @@ public class DownloadStringIntentService extends IntentService {
         String username = intent.getStringExtra(USERNAME_EXTRA);
         String password = intent.getStringExtra(PASSWORD_EXTRA);
 
+
         String data;
         try {
-            data = Utils.readFromURL(new URL("https://www.suso.schulen.konstanz.de/intern/index.php?type=vplan&user=" + username + "&pwd=" + password + "&console"))
+
+            username = URLEncoder.encode(username, "UTF-8");
+            password = URLEncoder.encode(password, "UTF-8");
+
+            URL url = new URL(getString(R.string.base_url) + "index.php?type=vplan&user=" + username + "&pwd=" + password + "&console");
+
+            if(BuildConfig.DEBUG_MODE)
+            {
+                Log.d("DownloadStringIntent", "Trying to fetch data from " + url.getQuery());
+            }
+
+            data = Utils.readFromURL(url)
             .replace("ï»¿", "");
 
         } catch (IOException e) {
-            System.err.println("Error while downloading substitution plan data from server");
+            Log.e("DownloadStringIntent", "Error while downloading substitution plan data from server! " +  e.getMessage());
             try {
                 reply.send(ERROR_CODE);
             } catch (PendingIntent.CanceledException e1) {}
             return;
+        }
+
+        if(BuildConfig.DEBUG_MODE)
+        {
+            Log.d("DownloadStringIntent", "Got data from Server: " + data);
         }
 
         Intent replyContent = new Intent();

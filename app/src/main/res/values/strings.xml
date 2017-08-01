@@ -7,7 +7,7 @@
 
     <string name="action_settings">Settings</string>
 
-    <string name="preference_file_key">de.konstanz.schulen.suso.data</string>
+    <string name="preference_file_key" translatable="false">de.konstanz.schulen.suso.data</string>
 
 
     <string name="day_monday">Montag</string>
@@ -31,5 +31,6 @@
     <string name ="substplan_json_error">Fehler beim Auslesen des Vertretungsplans (JSON). Daten sind möglicherweise unvollständig oder fehlerhaft</string>
     <string name="login_invalid_data">Benutzername oder Passwort ungültig</string>
     <string name="login_network_error">Fehler bei der Anmeldung. Bitte überprüfe deine Internetverbindung</string>
+    <string name="base_url" translatable="false">https://www.suso.schulen.konstanz.de/intern/</string>
 
 </resources>

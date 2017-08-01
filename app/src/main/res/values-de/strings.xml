@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Suso</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="day_friday">Freitag</string>
+    <string name="day_monday">Montag</string>
+    <string name="day_saturday">Samstag</string>
+    <string name="day_sunday">Sonntag</string>
+    <string name="day_thursday">Donnerstag</string>
+    <string name="day_tuesday">Dienstag</string>
+    <string name="day_wednesday">Mittwoch</string>
+    <string name="login_invalid_data">Benutzername oder Passwort ungültig</string>
+    <string name="login_network_error">Fehler bei der Anmeldung. Bitte überprüfe deine Internetverbindung</string>
+    <string name="navigation_drawer_close"></string>
+    <string name="no_substitutions">Keine Vertretungen</string>
+    <string name="substcard_comment">Kommentar:</string>
+    <string name="substcard_hour">Stunde:</string>
+    <string name="substcard_room">Raum:</string>
+    <string name="substcard_subject">Fach:</string>
+    <string name="substcard_teacher">Lehrer:</string>
+    <string name="substplan_json_error">Fehler beim Auslesen des Vertretungsplans (JSON). Daten sind möglicherweise unvollständig oder fehlerhaft</string>
+    <string name="substplan_network_error">Vertretungsplan konnte nicht heruntergeladen werden. Bitte überprüfe deine Internetverbinung</string>
+    <string name="title_activity_login">Anmelden</string>
+    <string name="title_activity_main">Suso</string>
+</resources>

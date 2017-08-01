@@ -1,9 +1,19 @@
 apply plugin: 'com.android.application'
 
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
+        buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
         applicationId "de.konstanz.schulen.suso"
         minSdkVersion 15
         targetSdkVersion 25
@@ -15,6 +25,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "Boolean", "DEBUG_MODE", "false"
+        }
+        debug {
+            buildConfigField "Boolean", "DEBUG_MODE", "true"
         }
     }
 }
