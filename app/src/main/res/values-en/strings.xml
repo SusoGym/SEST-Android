@@ -26,5 +26,6 @@
     <string name="login_username">Username</string>
     <string name="navigation_drawer_close">Close</string>
     <string name="navigation_drawer_open">Open</string>
-    <string name="login_error">An error occured while trying to log in.</string>
+    <string name="login_error">An error occurred while trying to log in.</string>
+    <string name="nav_blog">Blog</string>
 </resources>

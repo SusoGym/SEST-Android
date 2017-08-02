@@ -27,4 +27,5 @@
     <string name="login_username">Nutzername</string>
     <string name="navigation_drawer_open">Öffnen</string>
     <string name="login_error">Beim Anmelden ist ein Fehler aufgetreten.</string>
+    <string name="nav_blog">Blog</string>
 </resources>

@@ -22,7 +22,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
-        versionName "0.0.1a"
+        versionName "0.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -40,9 +40,19 @@ android {
             buildConfigField "Boolean", "DEBUG_MODE", "false"
             signingConfig signingConfigs.config
         }
+        demo {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "Boolean", "DEBUG_MODE", "false"
+            signingConfig signingConfigs.config
+            versionNameSuffix "-demo"
+            applicationIdSuffix ".demo"
+        }
         debug {
             buildConfigField "Boolean", "DEBUG_MODE", "true"
             signingConfig signingConfigs.config
+            versionNameSuffix  "-debug"
+            applicationIdSuffix ".debug"
         }
     }
 }

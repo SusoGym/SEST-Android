@@ -3,11 +3,16 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single"
+        android:id="@+id/drawer_content">
         <!--TODO Add Icons to all menu entries -->
         <item
             android:id="@+id/nav_substitutionplan"
             android:title="@string/nav_substitutionplan"/>
+        <item
+            android:id="@+id/nav_blog"
+            android:title="@string/nav_blog"
+            />
         <item
             android:id="@+id/nav_logout"
             android:title="@string/nav_logout"/>
