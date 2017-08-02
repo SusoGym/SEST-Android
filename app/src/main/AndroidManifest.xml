@@ -19,7 +19,7 @@
 
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/title_activity_main"
+            android:label="Suso"
             android:theme="@style/AppTheme"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
@@ -39,13 +39,9 @@
 
         </activity>
 
-        <service
-            android:name=".data.DownloadStringIntentService"
-            android:exported="false"/>
-
         <activity
             android:name=".activities.LoginActivity"
-            android:label="@string/title_activity_login"
+            android:label="Login"
             android:theme="@style/AppTheme"
             android:configChanges="orientation"
             android:screenOrientation="portrait">

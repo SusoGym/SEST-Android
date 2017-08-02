@@ -39,8 +39,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include
-        layout="@layout/content_main"></include>
+    <include layout="@layout/content_main"/>
 
 
 
