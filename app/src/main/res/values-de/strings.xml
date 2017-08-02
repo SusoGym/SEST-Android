@@ -10,7 +10,7 @@
     <string name="day_wednesday">Mittwoch</string>
     <string name="login_invalid_data">Benutzername oder Passwort ungültig</string>
     <string name="login_network_error">Fehler bei der Anmeldung. Bitte überprüfe deine Internetverbindung</string>
-    <string name="navigation_drawer_close"></string>
+    <string name="navigation_drawer_close">Schließen</string>
     <string name="no_substitutions">Keine Vertretungen</string>
     <string name="substcard_comment">Kommentar:</string>
     <string name="substcard_hour">Stunde:</string>
@@ -25,4 +25,6 @@
     <string name="login_loginbtn">Anmelden</string>
     <string name="login_password">Passwort</string>
     <string name="login_username">Nutzername</string>
+    <string name="navigation_drawer_open">Öffnen</string>
+    <string name="login_error">Beim Anmelden ist ein Fehler aufgetreten.</string>
 </resources>

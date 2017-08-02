@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +36,8 @@ import static de.konstanz.schulen.suso.util.SharedPreferencesManager.*;
 
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener,
-        GoogleApiClient.OnConnectionFailedListener
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks
 {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -69,16 +71,21 @@ public class LoginActivity extends AppCompatActivity
                     saveCredentialToSmartLock(username, pwd);
                     saveCredentialLocal(username, pwd);
                     startMain();
+                    return;
 
                 } else if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_INVALID_USER){
 
                     Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_invalid_data), Toast.LENGTH_SHORT).show();
 
-                } else {
+                } else if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_NETWORK_ERROR){
 
                     Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_network_error), Toast.LENGTH_SHORT).show();
 
+                } else {
+                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_error), Toast.LENGTH_SHORT).show();
                 }
+
+                requestCredentials();
             }
         });
 
@@ -108,6 +115,7 @@ public class LoginActivity extends AppCompatActivity
         mCredentialsApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.CREDENTIALS_API)
+                .addConnectionCallbacks(this)
                 .build();
 
 
@@ -140,20 +148,25 @@ public class LoginActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStart() {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.i(TAG, "GoogleApiClient connected");
+        Auth.CredentialsApi.disableAutoSignIn(mCredentialsApiClient);
 
         if(!mIsResolving)
         {
             requestCredentials();
         }
 
-        super.onStart();
-
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "GoogleApiClient connection suspended: " + i);
     }
 
     @Override

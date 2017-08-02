@@ -26,8 +26,8 @@
     <string name="substplan_network_error">Wasn\'t able to download Substitutionplan. Please check your internetconnection</string>
     <string name ="substplan_json_error">Error while trying to read substitution data. Data may be incorrect</string>
     <string name="login_invalid_data">Invalid username or password</string>
-    <string name="login_network_error">Error while trying to log in. Please check your internetconnection.</string>
-    <string name="base_url" translatable="false">https://est.smephite.com/</string>
+    <string name="login_network_error">Error while trying to log in. Please check your connection.</string>
+    <string name="base_url" translatable="false">https://suso.schulen.konstanz.de/intern/</string>
     <string name="nav_substitutionplan">Substitutionplan</string>
     <string name="nav_logout">Logout</string>
     <string name="asset_statements" translatable="false"> [{
@@ -37,5 +37,6 @@
     <string name="login_username">Username</string>
     <string name="login_password">Password</string>
     <string name="login_loginbtn">Login</string>
+    <string name="login_error">An error occured while trying to log in.</string>
 
 </resources>

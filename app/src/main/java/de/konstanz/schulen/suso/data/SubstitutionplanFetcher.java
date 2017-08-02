@@ -6,6 +6,9 @@ import android.util.Log;
 import com.google.android.gms.auth.api.credentials.Credential;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -77,9 +80,19 @@ public class SubstitutionplanFetcher
             {
                 return new SubstitutionplanResponse(SubstitutionplanResponse.STATUS_INVALID_USER, data);
             } else {
+                new JSONObject(data);
                 return new SubstitutionplanResponse(SubstitutionplanResponse.STATUS_OK, data);
             }
 
+        }catch(JSONException e) {
+            Log.e(TAG, "Received invalid Json data from Server: " + e .getMessage());
+
+            return new SubstitutionplanResponse(SubstitutionplanResponse.STATUS_INVALID_DATA, e.getMessage() == null ? "null" : e.getMessage());
+        }catch(IOException e){
+
+            Log.e(TAG, "I/O Error while fetching data from server: " + e .getMessage());
+
+            return new SubstitutionplanResponse(SubstitutionplanResponse.STATUS_NETWORK_ERROR, e.getMessage() == null ? "null" : e.getMessage());
         }catch (Exception e){
 
             Log.e(TAG, "Error while downloading substitution data from server: " + e.getMessage());
@@ -110,9 +123,11 @@ public class SubstitutionplanFetcher
     @Getter
     public static class SubstitutionplanResponse
     {
-        public static final int STATUS_ERROR = 400;
-        public static final int STATUS_OK = 200;
-        public static final int STATUS_INVALID_USER = 403;
+        public static final int STATUS_OK            = 200;
+        public static final int STATUS_INVALID_USER  = 403;
+        public static final int STATUS_INVALID_DATA  = 404;
+        public static final int STATUS_ERROR         = 500;
+        public static final int STATUS_NETWORK_ERROR = 504;
 
         @NonNull
         private int statusCode;

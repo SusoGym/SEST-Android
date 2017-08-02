@@ -24,4 +24,7 @@
     <string name="login_loginbtn">Login</string>
     <string name="login_password">Password</string>
     <string name="login_username">Username</string>
+    <string name="navigation_drawer_close">Close</string>
+    <string name="navigation_drawer_open">Open</string>
+    <string name="login_error">An error occured while trying to log in.</string>
 </resources>
