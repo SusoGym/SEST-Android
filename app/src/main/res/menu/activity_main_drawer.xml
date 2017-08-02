@@ -6,8 +6,11 @@
     <group android:checkableBehavior="single">
         <!--TODO Add Icons to all menu entries -->
         <item
-            android:id="@+id/nav_vertretungsplan"
-            android:title="Vertretungsplan"/>
+            android:id="@+id/nav_substitutionplan"
+            android:title="@string/nav_substitutionplan"/>
+        <item
+            android:id="@+id/nav_logout"
+            android:title="@string/nav_logout"/>
 
     </group>
 

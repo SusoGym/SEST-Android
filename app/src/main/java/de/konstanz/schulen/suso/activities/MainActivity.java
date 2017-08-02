@@ -1,9 +1,7 @@
-package de.konstanz.schulen.suso;
+package de.konstanz.schulen.suso.activities;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
@@ -40,34 +38,29 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 
-import de.konstanz.schulen.suso.data.DownloadStringIntentService;
+import de.konstanz.schulen.suso.BlogFragment;
+import de.konstanz.schulen.suso.BuildConfig;
+import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.SubstitutionplanFragment;
 import de.konstanz.schulen.suso.substitutionplan_recyclerview.SubstitutionData;
 import de.konstanz.schulen.suso.substitutionplan_recyclerview.SubstitutionDataAdapter;
+import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
+
+import static de.konstanz.schulen.suso.util.SharedPreferencesManager.*;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, BlogFragment.OnFragmentInteractionListener, SubstitutionplanFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, BlogFragment.OnFragmentInteractionListener, SubstitutionplanFragment.OnFragmentInteractionListener {
 
-    public static final String SUBSTITUTION_PLAN_DATA_KEY = "substitution_json";
-    public static final String USERNAME_KEY = "nov_username";
-    public static final String PASSWORD_KEY = "nov_password";
+    private SharedPreferences sharedPreferences = SharedPreferencesManager.getSharedPreferences();
 
-    //TODO TEST
-    private String username;
-    private String password;
-
-    DrawerLayout navigationDrawer;
-    FragmentManager fragmentManager;
-    Fragment currentFragment;
-    public static SharedPreferences sharedPreferences;
-
+    private DrawerLayout navigationDrawer;
+    private FragmentManager fragmentManager;
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
 
         setContentView(R.layout.activity_main);
@@ -102,7 +95,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if(currentFragment instanceof SubstitutionplanFragment){
-                    updateSubstitutionplan(username, password);
+                    updateSubstitutionplan();
                 }
             }
         });
@@ -136,17 +129,6 @@ public class MainActivity extends AppCompatActivity
     public void onStart(){
 
         super.onStart();
-
-        if(sharedPreferences.getString(USERNAME_KEY, null)==null){
-            Intent startLogin = new Intent(MainActivity.this, LoginActivity.class);
-            startLogin.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            startActivity(startLogin);
-            return;
-        }
-
-        username = sharedPreferences.getString(USERNAME_KEY, null);
-        password = sharedPreferences.getString(PASSWORD_KEY, null);
-
         showSubstitutionplan();
     }
 
@@ -168,28 +150,24 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-
-
-        return super.onOptionsItemSelected(item);
-    }
 
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if(id==R.id.nav_vertretungsplan){
+        if(id==R.id.nav_substitutionplan){
             if(!(currentFragment instanceof SubstitutionplanFragment)){
                 setViewFragment(new SubstitutionplanFragment());
                 showSubstitutionplan();
             }
+        } else if(id==R.id.nav_logout)
+        {
+            sharedPreferences.edit().remove(SHR_PASSWORD).remove(SHR_USERNAME).apply();
+
+            Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+            startActivity(intent);
+            finish();
         }
 
 
@@ -214,27 +192,23 @@ public class MainActivity extends AppCompatActivity
 
 
     private void showSubstitutionplan(){
-        String savedSubstitutionplanData = sharedPreferences.getString(SUBSTITUTION_PLAN_DATA_KEY, "");
-        if (!savedSubstitutionplanData.equals("")) {
+
+        String savedSubstitutionplanData = sharedPreferences.getString(SHR_SUBSITUTIONPLAN_DATA, null);
+        if (savedSubstitutionplanData != null) {
             displaySubstitutionplan(savedSubstitutionplanData);
         }
-        //TODO Add login UI
-        updateSubstitutionplan(username, password);
+
+        updateSubstitutionplan();
     }
 
-    private void updateSubstitutionplan(String username, String password){
-        PendingIntent pendingResult = createPendingResult(DownloadStringIntentService.INTENT_REQUEST_UPDATE_SUBSTPLAN, new Intent(), 0);
-        Intent intent = new Intent(getApplicationContext(), DownloadStringIntentService.class);
-        intent.putExtra(DownloadStringIntentService.USERNAME_EXTRA, username);
-        intent.putExtra(DownloadStringIntentService.PASSWORD_EXTRA, password);
-        intent.putExtra(DownloadStringIntentService.RESULT_INTENT_NAME, pendingResult);
-
-        startService(intent);
+    private void updateSubstitutionplan(){
+        //sharedPreferences.getString(SHR_USERNAME, null), sharedPreferences.getString(SHR_PASSWORD, null)
+        //download
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(requestCode== DownloadStringIntentService.INTENT_REQUEST_UPDATE_SUBSTPLAN){
+       /* if(requestCode== DownloadStringIntentService.INTENT_REQUEST_UPDATE_SUBSTPLAN){
             if(resultCode==DownloadStringIntentService.SUCCESSFUL_CODE){
                 //Executed after the substitution plan has successfully been downloaded
                 String json = data.getStringExtra(DownloadStringIntentService.RESULT_EXTRA);
@@ -243,7 +217,7 @@ public class MainActivity extends AppCompatActivity
                 if(!json.equals(savedJson)) {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(SUBSTITUTION_PLAN_DATA_KEY, json);
-                    editor.commit();
+                    editor.apply();
                     displaySubstitutionplan(json);
 
 
@@ -252,7 +226,7 @@ public class MainActivity extends AppCompatActivity
                 Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT);
                 errorToast.show();
             }
-        }
+        }*/
 
 
 
@@ -265,6 +239,7 @@ public class MainActivity extends AppCompatActivity
         substitutionplanContent.removeAllViews();
 
         try {
+
             JSONObject jsonObject = new JSONObject(json);
             JSONObject coverLessons = jsonObject.getJSONObject("coverlessons");
             Iterator<String> substitutionDays = coverLessons.keys();
@@ -339,13 +314,13 @@ public class MainActivity extends AppCompatActivity
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
             if(e.getMessage().contains("coverlessons of type org.json.JSONArray cannot be converted to JSONObject")) {
                 TextView infoView = new TextView(substitutionplanContent.getContext());
                 infoView.setGravity(Gravity.CENTER);
                 infoView.setText(R.string.no_substitutions);
                 substitutionplanContent.addView(infoView);
             }else{
+                e.printStackTrace();
                 Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
                 errorToast.show();
             }

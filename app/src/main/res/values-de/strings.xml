@@ -22,4 +22,5 @@
     <string name="substplan_network_error">Vertretungsplan konnte nicht heruntergeladen werden. Bitte überprüfe deine Internetverbinung</string>
     <string name="title_activity_login">Anmelden</string>
     <string name="title_activity_main">Suso</string>
+    <string name="nav_substitutionplan">Vertretungsplan</string>
 </resources>
