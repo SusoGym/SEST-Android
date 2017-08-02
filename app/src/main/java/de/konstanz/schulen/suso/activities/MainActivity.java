@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -42,8 +43,10 @@ import de.konstanz.schulen.suso.BlogFragment;
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.SubstitutionplanFragment;
+import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.substitutionplan_recyclerview.SubstitutionData;
 import de.konstanz.schulen.suso.substitutionplan_recyclerview.SubstitutionDataAdapter;
+import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
 
@@ -58,10 +61,12 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager fragmentManager;
     private Fragment currentFragment;
 
+    private @NonNull String username = sharedPreferences.getString(SHR_USERNAME, null);
+    private @NonNull String password = sharedPreferences.getString(SHR_PASSWORD, null);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -202,36 +207,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateSubstitutionplan(){
-        //sharedPreferences.getString(SHR_USERNAME, null), sharedPreferences.getString(SHR_PASSWORD, null)
-        //download
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-       /* if(requestCode== DownloadStringIntentService.INTENT_REQUEST_UPDATE_SUBSTPLAN){
-            if(resultCode==DownloadStringIntentService.SUCCESSFUL_CODE){
-                //Executed after the substitution plan has successfully been downloaded
-                String json = data.getStringExtra(DownloadStringIntentService.RESULT_EXTRA);
-                String savedJson = sharedPreferences.getString(SUBSTITUTION_PLAN_DATA_KEY, "");
-                //Only do anything if the old and updated data doesn't match
-                if(!json.equals(savedJson)) {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(SUBSTITUTION_PLAN_DATA_KEY, json);
-                    editor.apply();
-                    displaySubstitutionplan(json);
-
-
+        SubstitutionplanFetcher.fetchAsync(this.username, this.password, this, new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
+            @Override
+            public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
+                if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK)
+                {
+                    String json = request.getPayload();
+                    if(!sharedPreferences.getString(SHR_SUBSITUTIONPLAN_DATA, "").equals(json))
+                    {
+                        sharedPreferences.edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).apply();
+                        displaySubstitutionplan(json);
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
                 }
-            }else if(resultCode==DownloadStringIntentService.ERROR_CODE){
-                Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT);
-                errorToast.show();
             }
-        }*/
-
-
-
+        });
     }
-
 
     private void displaySubstitutionplan(String json){
 
@@ -247,48 +239,45 @@ public class MainActivity extends AppCompatActivity
             while(substitutionDays.hasNext()){
                 String dateKey = substitutionDays.next();
                 JSONArray daySubstitutions = coverLessons.getJSONArray(dateKey);
-
-
                 ArrayList<SubstitutionData> substitutions = new ArrayList<>();
-
 
                 /*
                 Get date information such as an easily readable string represantation or the day of week
                  */
                 String dateString;
-                {
-                    DateFormat readFormat = new SimpleDateFormat("yyyyMMdd");
-                    DateFormat writeFormat = new SimpleDateFormat("dd.MM.yyyy");
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(readFormat.parse(dateKey));
+
+                DateFormat readFormat = new SimpleDateFormat("yyyyMMdd");
+                DateFormat writeFormat = DateFormat.getDateInstance();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(readFormat.parse(dateKey));
 
 
-                    String dayOfWeek = "";
-                    switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-                        case Calendar.MONDAY:
-                            dayOfWeek = getResources().getString(R.string.day_monday);
-                            break;
-                        case Calendar.TUESDAY:
-                            dayOfWeek = getResources().getString(R.string.day_tuesday);
-                            break;
-                        case Calendar.WEDNESDAY:
-                            dayOfWeek = getResources().getString(R.string.day_wednesday);
-                            break;
-                        case Calendar.THURSDAY:
-                            dayOfWeek = getResources().getString(R.string.day_thursday);
-                            break;
-                        case Calendar.FRIDAY:
-                            dayOfWeek = getResources().getString(R.string.day_friday);
-                            break;
-                        case Calendar.SATURDAY:
-                            dayOfWeek = getResources().getString(R.string.day_saturday);
-                            break;
-                        case Calendar.SUNDAY:
-                            dayOfWeek = getResources().getString(R.string.day_sunday);
-                            break;
+                String dayOfWeek = "";
+                switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+                    case Calendar.MONDAY:
+                        dayOfWeek = getResources().getString(R.string.day_monday);
+                        break;
+                    case Calendar.TUESDAY:
+                        dayOfWeek = getResources().getString(R.string.day_tuesday);
+                        break;
+                    case Calendar.WEDNESDAY:
+                        dayOfWeek = getResources().getString(R.string.day_wednesday);
+                        break;
+                    case Calendar.THURSDAY:
+                        dayOfWeek = getResources().getString(R.string.day_thursday);
+                        break;
+                    case Calendar.FRIDAY:
+                        dayOfWeek = getResources().getString(R.string.day_friday);
+                        break;
+                    case Calendar.SATURDAY:
+                        dayOfWeek = getResources().getString(R.string.day_saturday);
+                        break;
+                    case Calendar.SUNDAY:
+                        dayOfWeek = getResources().getString(R.string.day_sunday);
+                        break;
                     }
                     dateString = dayOfWeek + ", " + writeFormat.format(calendar.getTime());
-                }
+
                 for(int i = 0; i<daySubstitutions.length(); ++i){
                     substitutions.add(new SubstitutionData(daySubstitutions.getJSONObject(i)));
                 }
@@ -314,16 +303,10 @@ public class MainActivity extends AppCompatActivity
             }
 
         } catch (JSONException e) {
-            if(e.getMessage().contains("coverlessons of type org.json.JSONArray cannot be converted to JSONObject")) {
                 TextView infoView = new TextView(substitutionplanContent.getContext());
                 infoView.setGravity(Gravity.CENTER);
                 infoView.setText(R.string.no_substitutions);
                 substitutionplanContent.addView(infoView);
-            }else{
-                e.printStackTrace();
-                Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
-                errorToast.show();
-            }
         } catch (ParseException e) {
             Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
             errorToast.show();

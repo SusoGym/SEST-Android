@@ -53,9 +53,6 @@ public class LoginActivity extends AppCompatActivity
         return mCredentialsApiClient;
     }
 
-
-
-
     private void checkLogin(final String username, final String pwd)
     {
         LoginActivity.USERNAME = username;
@@ -99,8 +96,6 @@ public class LoginActivity extends AppCompatActivity
         SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_USERNAME, username).putString(SHR_PASSWORD, pwd).commit();
 
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -303,6 +298,5 @@ public class LoginActivity extends AppCompatActivity
         }
         return sb.toString();
     }
-
 
 }

@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
-
-
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;

@@ -1,10 +1,6 @@
 package de.konstanz.schulen.suso.data;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.credentials.Credential;
