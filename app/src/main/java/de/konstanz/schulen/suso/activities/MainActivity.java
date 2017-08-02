@@ -12,6 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout navigationDrawer;
     private FragmentManager fragmentManager;
     private Fragment currentFragment;
+    private SwipeRefreshLayout swipeContainer;
 
     private @NonNull String username = sharedPreferences.getString(SHR_USERNAME, null);
     private @NonNull String password = sharedPreferences.getString(SHR_PASSWORD, null);
@@ -93,6 +97,20 @@ public class MainActivity extends AppCompatActivity
         transaction.add(R.id.content_main, currentFragment);
         transaction.commit();
 
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainerSubstitutionplan);
+
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(currentFragment instanceof SubstitutionplanFragment){
+                    updateSubstitutionplan();
+                }
+            }
+        });
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
 
         ImageButton toolbarRefresh = (ImageButton) findViewById(R.id.toolbar_refresh);
@@ -100,6 +118,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if(currentFragment instanceof SubstitutionplanFragment){
+                    swipeContainer.setRefreshing(true);
                     updateSubstitutionplan();
                 }
             }
@@ -221,6 +240,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
                 }
+                swipeContainer.setRefreshing(false);
             }
         });
     }
@@ -303,10 +323,14 @@ public class MainActivity extends AppCompatActivity
             }
 
         } catch (JSONException e) {
-                TextView infoView = new TextView(substitutionplanContent.getContext());
-                infoView.setGravity(Gravity.CENTER);
-                infoView.setText(R.string.no_substitutions);
-                substitutionplanContent.addView(infoView);
+            TextView infoView = new TextView(substitutionplanContent.getContext());
+            infoView.setText(R.string.no_substitutions);
+            infoView.setTextSize(25);
+            infoView.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            llp.setMargins(0, 40, 0, 0);
+            infoView.setLayoutParams(llp);
+            substitutionplanContent.addView(infoView);
         } catch (ParseException e) {
             Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
             errorToast.show();
