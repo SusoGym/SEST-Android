@@ -9,6 +9,15 @@ def getGitHash = { ->
     return stdout.toString().trim()
 }
 
+def getAmountOfCommits = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-list', '--count', "\"${getGitHash()}\""
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
@@ -21,7 +30,7 @@ android {
         applicationId "de.konstanz.schulen.suso"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 1
+        versionCode getAmountOfCommits().toInteger()
         versionName "0.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
