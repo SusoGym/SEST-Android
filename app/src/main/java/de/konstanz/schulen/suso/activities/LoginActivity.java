@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 
@@ -111,6 +112,13 @@ public class LoginActivity extends AppCompatActivity
 
         Button loginButton = (Button) findViewById(R.id.button_login);
         loginButton.setOnClickListener(this);
+        ImageView img = (ImageView) findViewById(R.id.login_img);
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestCredentials();
+            }
+        });
 
         mCredentialsApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)

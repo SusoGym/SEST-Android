@@ -14,6 +14,7 @@
         android:orientation="vertical"
         android:layout_marginTop="70dp">
         <ImageView
+            android:id="@+id/login_img"
             android:layout_width="match_parent"
             android:layout_height="130dp"
             android:layout_gravity="center"
