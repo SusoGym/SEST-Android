@@ -42,6 +42,10 @@
             android:screenOrientation="portrait">
         </activity>
         <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="da6a32ead207d72a41975278a99e85912ecc59aa"
+            />
     </application>
 
 </manifest>

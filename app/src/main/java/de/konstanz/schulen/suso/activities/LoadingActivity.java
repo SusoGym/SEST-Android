@@ -1,16 +1,24 @@
 package de.konstanz.schulen.suso.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
+import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
+import io.fabric.sdk.android.Fabric;
 
 import static de.konstanz.schulen.suso.util.SharedPreferencesManager.*;
 
@@ -26,15 +34,27 @@ public class LoadingActivity extends AppCompatActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(!BuildConfig.DEBUG_MODE) {
+            Fabric.with(this, new Crashlytics());
+        }
+
+
+        Thread welcomeThread = new Thread(this);
+        checkForPlayServices(welcomeThread);
+
         sharedPreferences = SharedPreferencesManager.getSharedPreferences() == null ? SharedPreferencesManager.initialize(this) : SharedPreferencesManager.getSharedPreferences();
 
         setContentView(R.layout.activity_loading);
         spinner = (ProgressBar)findViewById(R.id.loading_progressbar);
         spinner.setVisibility(View.VISIBLE);
 
-        Thread welcomeThread = new Thread(this);
-        welcomeThread.start();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkForPlayServices(null);
     }
 
     @Override
@@ -64,6 +84,16 @@ public class LoadingActivity extends AppCompatActivity implements
 
         return resp.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK;
 
+    }
+
+    private void checkForPlayServices(final Thread thread){
+        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this).addOnCompleteListener(this, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(thread != null)
+                    thread.start();
+            }
+        });
     }
 
 }

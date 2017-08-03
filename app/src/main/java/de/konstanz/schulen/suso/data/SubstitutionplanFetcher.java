@@ -74,7 +74,7 @@ public class SubstitutionplanFetcher
             String data = readFromURL(url)
                     .replace("ï»¿", "");
 
-            Log.d(TAG, "Successfully fetched data: " + data);
+            Log.d(TAG, "Successfully fetched data! ");
 
             if(data.contains("Invalid userdata!"))
             {
