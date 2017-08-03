@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.LoginEvent;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
 import com.google.android.gms.auth.api.credentials.CredentialRequest;
@@ -56,7 +58,7 @@ public class LoginActivity extends AppCompatActivity
         return mCredentialsApiClient;
     }
 
-    private void checkLogin(final String username, final String pwd)
+    private void checkLogin(final String username, final String pwd, final boolean smartLock)
     {
         LoginActivity.USERNAME = username;
         LoginActivity.PASSWORD = pwd;
@@ -65,6 +67,8 @@ public class LoginActivity extends AppCompatActivity
         SubstitutionplanFetcher.fetchAsync(username, pwd, this, new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
             @Override
             public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
+                boolean success = false;
+
                 if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK)
                 {
                     USERNAME = username;
@@ -72,7 +76,7 @@ public class LoginActivity extends AppCompatActivity
                     saveCredentialToSmartLock(username, pwd);
                     saveCredentialLocal(username, pwd);
                     startMain();
-                    return;
+                    success = true;
 
                 } else if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_INVALID_USER){
 
@@ -86,7 +90,16 @@ public class LoginActivity extends AppCompatActivity
                     Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_error), Toast.LENGTH_SHORT).show();
                 }
 
-                requestCredentials();
+                if(!success){
+                    requestCredentials();
+                }
+
+                if(!BuildConfig.DEBUG_MODE)
+                {
+                    Answers.getInstance().logLogin(new LoginEvent().putMethod(smartLock ? "smartLock" : "manual").putSuccess(success));
+                }
+
+
             }
         });
 
@@ -152,7 +165,7 @@ public class LoginActivity extends AppCompatActivity
             return;
         }
 
-        checkLogin(username, password);
+        checkLogin(username, password, false);
     }
 
     @Override
@@ -305,7 +318,7 @@ public class LoginActivity extends AppCompatActivity
         Log.d(TAG, "Credential Retrieved: " + credential.getId() + ":" +
                 anonymizePassword(credential.getPassword()));
 
-        checkLogin(credential.getId(), credential.getPassword());
+        checkLogin(credential.getId(), credential.getPassword(), true);
     }
     /** Make a SHR_PASSWORD into asterisks of the right length, for logging. **/
     private String anonymizePassword(String password) {
