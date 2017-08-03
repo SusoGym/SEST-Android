@@ -5,6 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
+
+import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 
 
@@ -24,7 +28,15 @@ public class BlogFragment extends AbstractFragment {
 
 
     @Override
-    public void refresh() {
+    public void refresh()
+    {
+
+        boolean success = true;
+
+        if(BuildConfig.DEBUG_MODE)
+        {
+            Answers.getInstance().logCustom(new CustomEvent("Reloaded Blog").putCustomAttribute("success", success + ""));
+        }
 
     }
 }

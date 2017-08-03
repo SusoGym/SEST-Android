@@ -1,6 +1,10 @@
 package de.konstanz.schulen.suso.activities.fragment;
 
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
+
+import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.activities.MainActivity;
 

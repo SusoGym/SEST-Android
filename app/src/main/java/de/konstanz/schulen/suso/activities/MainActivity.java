@@ -25,6 +25,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 
+import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.activities.fragment.AbstractFragment;
 import de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment;
@@ -225,6 +229,7 @@ public class MainActivity extends AppCompatActivity
         SubstitutionplanFetcher.fetchAsync(this.username, this.password, this, new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
             @Override
             public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
+                boolean success = true;
                 if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK)
                 {
                     String json = request.getPayload();
@@ -234,7 +239,12 @@ public class MainActivity extends AppCompatActivity
                         displaySubstitutionplan(json);
                     }
                 } else {
+                    success = false;
                     Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
+                }
+                if(BuildConfig.DEBUG_MODE)
+                {
+                    Answers.getInstance().logCustom(new CustomEvent("Reloaded Substitutionplan").putCustomAttribute("success", success + ""));
                 }
                 swipeContainer.setRefreshing(false);
             }
