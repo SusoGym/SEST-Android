@@ -44,8 +44,6 @@ import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.activities.fragment.AbstractFragment;
 import de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
-import de.konstanz.schulen.suso.substitutionplan_recyclerview.SubstitutionData;
-import de.konstanz.schulen.suso.substitutionplan_recyclerview.SubstitutionDataAdapter;
 import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
@@ -253,93 +251,19 @@ public class MainActivity extends AppCompatActivity
 
     private void displaySubstitutionplan(String json){
 
-        LinearLayout substitutionplanContent = (LinearLayout) findViewById(R.id.content_substitutionplan);
-        substitutionplanContent.removeAllViews();
+        if(!(currentFragment instanceof SubstitutionplanFragment))
+            return;
+
+        SubstitutionplanFragment f = (SubstitutionplanFragment)currentFragment;
 
         try {
 
             JSONObject jsonObject = new JSONObject(json);
             JSONObject coverLessons = jsonObject.getJSONObject("coverlessons");
-            Iterator<String> substitutionDays = coverLessons.keys();
-            //Iterate over the days
-            while(substitutionDays.hasNext()){
-                String dateKey = substitutionDays.next();
-                JSONArray daySubstitutions = coverLessons.getJSONArray(dateKey);
-                ArrayList<SubstitutionData> substitutions = new ArrayList<>();
-
-                /*
-                Get date information such as an easily readable string represantation or the day of week
-                 */
-                String dateString;
-
-                DateFormat readFormat = new SimpleDateFormat("yyyyMMdd");
-                DateFormat writeFormat = DateFormat.getDateInstance();
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(readFormat.parse(dateKey));
-
-
-                String dayOfWeek = "";
-                switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-                    case Calendar.MONDAY:
-                        dayOfWeek = getResources().getString(R.string.day_monday);
-                        break;
-                    case Calendar.TUESDAY:
-                        dayOfWeek = getResources().getString(R.string.day_tuesday);
-                        break;
-                    case Calendar.WEDNESDAY:
-                        dayOfWeek = getResources().getString(R.string.day_wednesday);
-                        break;
-                    case Calendar.THURSDAY:
-                        dayOfWeek = getResources().getString(R.string.day_thursday);
-                        break;
-                    case Calendar.FRIDAY:
-                        dayOfWeek = getResources().getString(R.string.day_friday);
-                        break;
-                    case Calendar.SATURDAY:
-                        dayOfWeek = getResources().getString(R.string.day_saturday);
-                        break;
-                    case Calendar.SUNDAY:
-                        dayOfWeek = getResources().getString(R.string.day_sunday);
-                        break;
-                    }
-                    dateString = dayOfWeek + ", " + writeFormat.format(calendar.getTime());
-
-                for(int i = 0; i<daySubstitutions.length(); ++i){
-                    substitutions.add(new SubstitutionData(daySubstitutions.getJSONObject(i)));
-                }
-
-                /*
-                Create the UI and data interfaces necessary to represent a substitution day
-                and fill them with the parsed substitutions
-                 */
-                SubstitutionDataAdapter adapter = new SubstitutionDataAdapter(substitutions);
-                RecyclerView recyclerView = new RecyclerView(substitutionplanContent.getContext());
-                recyclerView.setLayoutManager(new LinearLayoutManager(substitutionplanContent.getContext()){
-                    @Override
-                    public boolean canScrollVertically(){ return false; }
-                });
-                recyclerView.setAdapter(adapter);
-
-                TextView dateView = new TextView(substitutionplanContent.getContext());
-                dateView.setGravity(Gravity.CENTER);
-                dateView.setText(dateString);
-
-                substitutionplanContent.addView(dateView);
-                substitutionplanContent.addView(recyclerView);
-            }
+            f.displaySubsitutionplan(coverLessons);
 
         } catch (JSONException e) {
-            TextView infoView = new TextView(substitutionplanContent.getContext());
-            infoView.setText(R.string.no_substitutions);
-            infoView.setTextSize(25);
-            infoView.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            llp.setMargins(0, 40, 0, 0);
-            infoView.setLayoutParams(llp);
-            substitutionplanContent.addView(infoView);
-        } catch (ParseException e) {
-            Toast errorToast = Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG);
-            errorToast.show();
+            f.displayNoSubstitution();
         }
 
 
