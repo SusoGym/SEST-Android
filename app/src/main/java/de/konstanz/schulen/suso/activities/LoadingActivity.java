@@ -41,12 +41,13 @@ public class LoadingActivity extends AppCompatActivity implements
 
         FirebaseHandler.getInstance().startup();
 
-        Thread welcomeThread = new Thread(this);
-        checkForPlayServices(welcomeThread);
-
         sharedPreferences = SharedPreferencesManager.getSharedPreferences() == null ? SharedPreferencesManager.initialize(this) : SharedPreferencesManager.getSharedPreferences();
 
         setContentView(R.layout.activity_loading);
+
+        Thread welcomeThread = new Thread(this);
+        checkForPlayServices(welcomeThread);
+
         spinner = (ProgressBar)findViewById(R.id.loading_progressbar);
         spinner.setVisibility(View.VISIBLE);
 

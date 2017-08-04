@@ -47,6 +47,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
+        buildConfigField "int", "GIT_COMMITS", "${getAmountOfCommits()}"
         applicationId "de.konstanz.schulen.suso"
         minSdkVersion 15
         targetSdkVersion 25

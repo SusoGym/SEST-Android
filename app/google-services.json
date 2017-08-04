@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "552342931470-45pfadq30sgn1mgupkb2eagcvvf097vu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.konstanz.schulen.suso",
+            "certificate_hash": "4065ea5a3eff2612b7f23122726ac7de2e8118c5"
+          }
+        },
+        {
           "client_id": "552342931470-ckl3it589p13u63ti4f3kknp7sggjc1j.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552342931470-ckl3it589p13u63ti4f3kknp7sggjc1j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

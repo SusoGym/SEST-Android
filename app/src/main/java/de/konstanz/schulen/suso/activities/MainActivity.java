@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity
                     success = false;
                     Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
                 }
-                if(BuildConfig.DEBUG_MODE)
+                if(!BuildConfig.DEBUG_MODE)
                 {
                     Answers.getInstance().logCustom(new CustomEvent("Reloaded Substitutionplan").putCustomAttribute("success", success + ""));
                 }
