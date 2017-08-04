@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.Task;
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
+import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 import io.fabric.sdk.android.Fabric;
 
@@ -38,6 +39,7 @@ public class LoadingActivity extends AppCompatActivity implements
             Fabric.with(this, new Crashlytics());
         }
 
+        FirebaseHandler.getInstance().startup();
 
         Thread welcomeThread = new Thread(this);
         checkForPlayServices(welcomeThread);
