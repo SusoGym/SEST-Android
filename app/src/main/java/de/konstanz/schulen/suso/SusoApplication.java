@@ -24,8 +24,9 @@ public class SusoApplication extends Application {
 
         SharedPreferencesManager.initialize(this);
 
+        String testLab = Settings.System.getString(getContentResolver(), "firebase.test.lab");
 
-        if(Settings.System.getString(getContentResolver(), "firebase.test.lab").equals("true"))
+        if(testLab != null && testLab.equals("true"))
         {
             USE_FABRIC = false; // we are in an testing environment
             Log.i(TAG, "Welcome Testing!");
