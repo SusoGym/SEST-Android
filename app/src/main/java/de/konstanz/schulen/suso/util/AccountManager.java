@@ -47,8 +47,6 @@ public class AccountManager {
 
     public void loadFromOnline(final Context ctx, @Nullable final Callback<String> callback, final boolean rw) {
 
-        new Exception().printStackTrace();
-
         new Thread() {
             @Override
             public void run() {
