@@ -10,6 +10,7 @@ import com.crashlytics.android.answers.CustomEvent;
 
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.SusoApplication;
 
 
 public class BlogFragment extends AbstractFragment {
@@ -33,7 +34,7 @@ public class BlogFragment extends AbstractFragment {
 
         boolean success = true;
 
-        if(BuildConfig.DEBUG_MODE)
+        if(SusoApplication.USE_FABRIC)
         {
             Answers.getInstance().logCustom(new CustomEvent("Reloaded Blog").putCustomAttribute("success", success + ""));
         }

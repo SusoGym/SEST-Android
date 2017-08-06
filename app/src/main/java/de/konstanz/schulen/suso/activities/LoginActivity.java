@@ -29,6 +29,7 @@ import com.google.android.gms.common.api.Status;
 
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.SusoApplication;
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.Callback;
@@ -78,7 +79,7 @@ public class LoginActivity extends AppCompatActivity
                         break;
                 }
 
-                if (!BuildConfig.DEBUG_MODE) {
+                if (SusoApplication.USE_FABRIC) {
                     Answers.getInstance().logLogin(new LoginEvent().putMethod(smartLock ? "smartLock" : "manual").putSuccess(success));
                 }
 

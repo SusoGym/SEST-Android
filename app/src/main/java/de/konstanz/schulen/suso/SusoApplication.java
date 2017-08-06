@@ -2,6 +2,8 @@ package de.konstanz.schulen.suso;
 
 import android.app.Application;
 import android.content.Context;
+import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -12,13 +14,24 @@ import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 import io.fabric.sdk.android.Fabric;
 
 public class SusoApplication extends Application {
+
+    public static final String TAG = SusoApplication.class.getSimpleName();
+
+    public static boolean USE_FABRIC = !BuildConfig.DEBUG_MODE;
+
     @Override
     public void onCreate() {
 
         SharedPreferencesManager.initialize(this);
 
 
-        if(!BuildConfig.DEBUG_MODE) {
+        if(Settings.System.getString(getContentResolver(), "firebase.test.lab").equals("true"))
+        {
+            USE_FABRIC = false; // we are in an testing environment
+            Log.i(TAG, "Welcome Testing!");
+        }
+
+        if(USE_FABRIC) {
             Fabric.with(this, new Crashlytics());
         }
 

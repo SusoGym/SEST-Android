@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.SusoApplication;
 import de.konstanz.schulen.suso.activities.fragment.AbstractFragment;
 import de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
@@ -222,7 +223,7 @@ public class MainActivity extends AppCompatActivity
                     success = false;
                     Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
                 }
-                if(!BuildConfig.DEBUG_MODE)
+                if(SusoApplication.USE_FABRIC)
                 {
                     Answers.getInstance().logCustom(new CustomEvent("Reloaded Substitutionplan").putCustomAttribute("success", success + ""));
                 }
