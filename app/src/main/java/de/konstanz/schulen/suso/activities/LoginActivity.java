@@ -1,7 +1,5 @@
 package de.konstanz.schulen.suso.activities;
 
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -31,26 +29,18 @@ import com.google.android.gms.common.api.Status;
 
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
-import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
+import de.konstanz.schulen.suso.firebase.FirebaseHandler;
+import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.Callback;
-import de.konstanz.schulen.suso.util.SharedPreferencesManager;
-
-import static de.konstanz.schulen.suso.util.SharedPreferencesManager.*;
 
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks
-{
+        GoogleApiClient.ConnectionCallbacks {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-    private static final String KEY_IS_RESOLVING = "is_resolving";
     private static final int RC_SAVE = 1;
     private static final int RC_READ = 3;
-
-    public static String USERNAME;
-    public static String PASSWORD;
-
     private static GoogleApiClient mCredentialsApiClient;
     private boolean mIsResolving = false;
 
@@ -58,64 +48,56 @@ public class LoginActivity extends AppCompatActivity
         return mCredentialsApiClient;
     }
 
-    private void checkLogin(final String username, final String pwd, final boolean smartLock)
-    {
-        LoginActivity.USERNAME = username;
-        LoginActivity.PASSWORD = pwd;
+    private void checkLogin(final String username, final String pwd, final boolean smartLock) {
 
+        AccountManager.getInstance().setPassword(pwd).setUsername(username);
 
-        SubstitutionplanFetcher.fetchAsync(username, pwd, this, new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
+        AccountManager.getInstance().loadFromOnline(this, new Callback<String>() {
             @Override
-            public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
+            public void callback(String response) {
+
                 boolean success = false;
 
-                if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK)
+                switch (response)
                 {
-                    USERNAME = username;
-                    PASSWORD = pwd;
-                    saveCredentialToSmartLock(username, pwd);
-                    saveCredentialLocal(username, pwd);
-                    startMain();
-                    success = true;
+                    case "OK":
+                        saveCredentialToSmartLock(username, pwd);
+                        AccountManager.getInstance().saveToSharedPreferences();
+                        success = true;
 
-                } else if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_INVALID_USER){
-
-                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_invalid_data), Toast.LENGTH_SHORT).show();
-
-                } else if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_NETWORK_ERROR){
-
-                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_network_error), Toast.LENGTH_SHORT).show();
-
-                } else {
-                    Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_error), Toast.LENGTH_SHORT).show();
+                        FirebaseHandler.getInstance().registerToken(); // send our new account to database to link with this device
+                        break;
+                    case "INVALID_DATA":
+                        Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_invalid_data), Toast.LENGTH_SHORT).show();
+                        break;
+                    case "INVALID_USER":
+                        Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_network_error), Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_error), Toast.LENGTH_SHORT).show();
+                        break;
                 }
 
-                if(!success){
-                    requestCredentials();
-                }
-
-                if(!BuildConfig.DEBUG_MODE)
-                {
+                if (!BuildConfig.DEBUG_MODE) {
                     Answers.getInstance().logLogin(new LoginEvent().putMethod(smartLock ? "smartLock" : "manual").putSuccess(success));
+                }
+
+                if (!success) {
+                    requestCredentials();
+                } else {
+                    startMain();
                 }
 
 
             }
-        });
+        }, true);
 
     }
 
-    private void startMain()
-    {
+    private void startMain() {
         Intent i = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(i);
         finish();
-    }
-
-    private void saveCredentialLocal(String username, String pwd)
-    {
-        SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_USERNAME, username).putString(SHR_PASSWORD, pwd).commit();
-
     }
 
     @Override
@@ -144,22 +126,19 @@ public class LoginActivity extends AppCompatActivity
 
     @Override
     public void onClick(View view) {
-        String username = ((EditText)findViewById(R.id.edittext_username)).getText().toString();
-        String password = ((EditText)findViewById(R.id.edittext_password)).getText().toString();
+        String username = ((EditText) findViewById(R.id.edittext_username)).getText().toString();
+        String password = ((EditText) findViewById(R.id.edittext_password)).getText().toString();
 
-        if(BuildConfig.DEBUG_MODE)
-        {
+        if (BuildConfig.DEBUG_MODE) {
 
-            if(username.equals("") && password.equals(""))
-            {
+            if (username.equals("") && password.equals("")) {
                 username = password = "Oberstufe";
             }
 
             Log.d("LoginActivity", "Login try with: ['" + username + "', '" + password + "']");
         }
 
-        if(username.equals("") || password.equals(""))
-        {
+        if (username.equals("") || password.equals("")) {
 
             Toast.makeText(view.getContext(), "Password or Username is empty", Toast.LENGTH_LONG).show();
             return;
@@ -178,8 +157,7 @@ public class LoginActivity extends AppCompatActivity
         Log.i(TAG, "GoogleApiClient connected");
         Auth.CredentialsApi.disableAutoSignIn(mCredentialsApiClient);
 
-        if(!mIsResolving)
-        {
+        if (!mIsResolving) {
             requestCredentials();
         }
 
@@ -191,14 +169,13 @@ public class LoginActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         smartLockOnActivity(requestCode, resultCode, data);
 
     }
 
-    private void smartLockOnActivity(int requestCode, int resultCode, Intent data)
-    {
+    private void smartLockOnActivity(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
 
         switch (requestCode) {
@@ -224,8 +201,7 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    private void saveCredentialToSmartLock(String user, String pwd)
-    {
+    private void saveCredentialToSmartLock(String user, String pwd) {
         Log.d(TAG, "Saving Credential:" + user + ":" + anonymizePassword(pwd));
         final Credential credential = new Credential.Builder(user)
                 .setPassword(pwd)
@@ -282,9 +258,11 @@ public class LoginActivity extends AppCompatActivity
                     }
                 });
     }
+
     /**
      * Attempt to resolve a non-successful Status from an asynchronous request.
-     * @param status the Status to resolve.
+     *
+     * @param status      the Status to resolve.
      * @param requestCode the request code to use when starting an Activity for result,
      *                    this will be passed back to onActivityResult.
      */
@@ -312,6 +290,7 @@ public class LoginActivity extends AppCompatActivity
 
     /**
      * Process a Credential object retrieved from a successful request.
+     *
      * @param credential the Credential to process.
      */
     private void processRetrievedCredential(Credential credential) {
@@ -320,7 +299,10 @@ public class LoginActivity extends AppCompatActivity
 
         checkLogin(credential.getId(), credential.getPassword(), true);
     }
-    /** Make a SHR_PASSWORD into asterisks of the right length, for logging. **/
+
+    /**
+     * Make a SHR_PASSWORD into asterisks of the right length, for logging.
+     **/
     private String anonymizePassword(String password) {
         if (password == null) {
             return "null";

@@ -73,7 +73,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
                 ArrayList<SubstitutionData> substitutions = new ArrayList<>();
 
 
-                for (int i = 0; i <= daySubstitutions.length(); i++) {
+                for (int i = 0; i < daySubstitutions.length(); ++i) {
                     substitutions.add(new SubstitutionplanFragment.SubstitutionData(daySubstitutions.getJSONObject(i)));
                 }
 

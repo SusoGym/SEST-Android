@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.util.Callback;
+import de.konstanz.schulen.suso.util.IOUtility;
 import de.konstanz.schulen.suso.util.ThreadHandler;
 import lombok.Getter;
 import lombok.NonNull;
@@ -56,7 +57,7 @@ public class SubstitutionplanFetcher
         return fetchSync(credential.getId(), credential.getPassword(), ctx);
     }
 
-    public static SubstitutionplanResponse fetchSync(String username, String password, Context ctx)
+    public static SubstitutionplanResponse fetchSync(@NonNull String username, @NonNull String password, Context ctx)
     {
 
         try{
@@ -71,7 +72,7 @@ public class SubstitutionplanFetcher
                 Log.d(TAG, "Trying to fetch substitution data from " + url.toExternalForm());
             }
 
-            String data = readFromURL(url)
+            String data = IOUtility.readFromURL(url)
                     .replace("ï»¿", "");
 
             Log.d(TAG, "Successfully fetched data! ");
@@ -104,19 +105,6 @@ public class SubstitutionplanFetcher
 
     }
 
-
-    private static String readFromURL(URL url) throws IOException {
-        InputStream is;
-
-        is = url.openStream();
-
-        int temp;
-        StringBuilder data = new StringBuilder();
-        while((temp = is.read()) !=-1){
-            data.append((char) temp);
-        }
-        return data.toString();
-    }
 
 
 

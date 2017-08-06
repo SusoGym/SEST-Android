@@ -18,6 +18,7 @@ import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
+import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 import io.fabric.sdk.android.Fabric;
 
@@ -29,20 +30,10 @@ public class LoadingActivity extends AppCompatActivity implements
     private static final String TAG = LoadingActivity.class.getSimpleName();
 
     private ProgressBar spinner;
-    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if(!BuildConfig.DEBUG_MODE) {
-            Fabric.with(this, new Crashlytics());
-        }
-
-        FirebaseHandler.getInstance().startup();
-
-        sharedPreferences = SharedPreferencesManager.getSharedPreferences() == null ? SharedPreferencesManager.initialize(this) : SharedPreferencesManager.getSharedPreferences();
-
         setContentView(R.layout.activity_loading);
 
         Thread welcomeThread = new Thread(this);
@@ -68,7 +59,7 @@ public class LoadingActivity extends AppCompatActivity implements
         // Login is not saved in SharedPrefs or login is wrong -> no direct login
         targetClass = LoginActivity.class;
 
-        if(sharedPreferences.contains(SHR_USERNAME) && sharedPreferences.contains(SHR_PASSWORD) && validLogin(sharedPreferences.getString(SHR_USERNAME, null), sharedPreferences.getString(SHR_PASSWORD, null)))
+        if(AccountManager.getInstance().isValidLogin(this))
         {
             // Login is saved in SharedPrefs -> direct login
             targetClass = MainActivity.class;
@@ -77,15 +68,6 @@ public class LoadingActivity extends AppCompatActivity implements
         Intent i = new Intent(LoadingActivity.this, targetClass);
         startActivity(i);
         finish();
-
-    }
-
-
-    private boolean validLogin(String usr, String pwd)
-    {
-        SubstitutionplanFetcher.SubstitutionplanResponse resp = SubstitutionplanFetcher.fetchSync(usr, pwd, this);
-
-        return resp.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK;
 
     }
 

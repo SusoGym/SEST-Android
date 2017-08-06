@@ -13,44 +13,29 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
 
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.activities.fragment.AbstractFragment;
 import de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
+import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
-import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_PASSWORD;
 import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA;
-import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_USERNAME;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -72,9 +57,6 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager fragmentManager;
     private AbstractFragment currentFragment;
     private SwipeRefreshLayout swipeContainer;
-
-    private @NonNull String username = sharedPreferences.getString(SHR_USERNAME, null);
-    private @NonNull String password = sharedPreferences.getString(SHR_PASSWORD, null);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,7 +179,7 @@ public class MainActivity extends AppCompatActivity
             setActiveFragment(clazz);
         } else if(id==R.id.nav_logout)
         { // selected logged out TODO: add smoother way of handling this
-            sharedPreferences.edit().remove(SHR_PASSWORD).remove(SHR_USERNAME).apply();
+            AccountManager.getInstance().logout();
 
             Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
             startActivity(intent);
@@ -224,7 +206,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void updateSubstitutionplan(){
-        SubstitutionplanFetcher.fetchAsync(this.username, this.password, this, new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
+        SubstitutionplanFetcher.fetchAsync(AccountManager.getInstance().getUsername(), AccountManager.getInstance().getPassword(), this, new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
             @Override
             public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
                 boolean success = true;
