@@ -273,19 +273,23 @@ public class SubstitutionplanFragment extends AbstractFragment {
         }
 
         void initialize(SubstitutionData data) {
-            textView.setText(ctx.getString(R.string.substcard_hour) + data.getHour() + "\n" +
-                    ctx.getString(R.string.substcard_teacher) + data.getTeacher() + data.getSubTeacher() + '\n' +
-                    ctx.getString(R.string.substcard_subject) + data.getSubject() + data.getSubSubject() + '\n' +
-                    (data.getSubRoom().isEmpty() ? "" : ctx.getString(R.string.substcard_room) + data.getSubRoom() + '\n') +
-                    ctx.getString(R.string.substcard_comment) + data.getComment(), TextView.BufferType.SPANNABLE);
+
+            String hour = ctx.getString(R.string.substcard_hour) + " " + data.getHour() + "\n";
+            String teacher = ctx.getString(R.string.substcard_teacher) + " " + data.getTeacher() + data.getSubTeacher() + '\n';
+            String subject = ctx.getString(R.string.substcard_subject) + " " +data.getSubject() + data.getSubSubject() + '\n';
+            String room = (data.getSubRoom().isEmpty() ? "" : ctx.getString(R.string.substcard_room) + " " + data.getSubRoom() + '\n');
+            String comment = ctx.getString(R.string.substcard_comment) + " " + data.getComment();
+
+            textView.setText( hour + teacher + subject + room + comment, TextView.BufferType.SPANNABLE);
 
             Spannable spannable = (Spannable) textView.getText();
 
-            int teacherIndex = 17 + data.getHour().length();
+            int teacherIndex = hour.length() + ctx.getString(R.string.substcard_teacher).length() + 1;
             int teacherEnd = teacherIndex + data.getTeacher().length();
 
-            int subjectIndex = teacherEnd + data.getSubTeacher().length() + 7;
+            int subjectIndex = hour.length() + teacher.length() + ctx.getString(R.string.substcard_subject).length() + 1;
             int subjectEnd = subjectIndex + data.getSubject().length();
+
             if (!data.getTeacher().isEmpty())
                 spannable.setSpan(new StrikethroughSpan(), teacherIndex, teacherEnd - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             if (!data.getSubject().isEmpty())
