@@ -14,11 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +26,6 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
-import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.activities.MainActivity;
 
@@ -65,9 +59,14 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
                 String dateKey = substitutionDays.next();
 
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 TextView dateView = new TextView(substitutionplanContent.getContext());
                 dateView.setGravity(Gravity.CENTER);
                 dateView.setText(getDate(dateKey));
+                dateView.setTextSize(30f);
+                lp.setMargins(0, 70, 0, 30);
+                lp.gravity = Gravity.CENTER;
+                dateView.setLayoutParams(lp);
 
                 JSONArray daySubstitutions = coverLessons.getJSONArray(dateKey);
                 ArrayList<SubstitutionData> substitutions = new ArrayList<>();
@@ -113,7 +112,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
         llp.setMargins(0, 40, 0, 0);
         infoView.setLayoutParams(llp);
         substitutionplanContent.addView(infoView);
-        Toast.makeText(getActivity(), getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG).show();
+
 
     }
 

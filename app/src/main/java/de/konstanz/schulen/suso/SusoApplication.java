@@ -22,6 +22,8 @@ public class SusoApplication extends Application {
     @Override
     public void onCreate() {
 
+        Log.i(TAG, "Starting Suso App...");
+
         SharedPreferencesManager.initialize(this);
 
         String testLab = Settings.System.getString(getContentResolver(), "firebase.test.lab");
@@ -36,10 +38,11 @@ public class SusoApplication extends Application {
             Fabric.with(this, new Crashlytics());
         }
 
+        CharSequence text = "Version: " + BuildConfig.VERSION_NAME + "/" + BuildConfig.GIT_HASH + "(" + BuildConfig.GIT_COMMITS + ")";
+
         if(BuildConfig.DEBUG_MODE)
         {
             Context context = getApplicationContext();
-            CharSequence text = "Version: " + BuildConfig.VERSION_NAME + "/" + BuildConfig.GIT_HASH + "(" + BuildConfig.GIT_COMMITS + ")";
             int duration = Toast.LENGTH_LONG;
 
             Toast toast = Toast.makeText(context, text, duration);
@@ -47,11 +50,14 @@ public class SusoApplication extends Application {
             toast.show();
         }
 
+        Log.i(TAG, text.toString());
+
         AccountManager.getInstance().loadFromSharedPreferences(this);
 
         FirebaseHandler.getInstance().setEndPoint(getString(R.string.base_url));
         FirebaseHandler.getInstance().startup(this);
 
+        Log.i(TAG, "Successfully started Suso App");
         super.onCreate();
     }
 }

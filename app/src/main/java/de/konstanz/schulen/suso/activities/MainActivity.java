@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity
                         displaySubstitutionplan(json);
                     }
                 } else {
+                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getStatusCode() + "/" + request.getPayload());
                     success = false;
                     Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
                 }
@@ -246,7 +247,16 @@ public class MainActivity extends AppCompatActivity
             f.displaySubsitutionplan(coverLessons);
 
         } catch (JSONException e) {
+            Log.e(TAG, "Error while trying to display substitutions: " + e.getMessage());
             f.displayNoSubstitution();
+
+            if(!e.getMessage().contains("Value [] at coverlessons"))
+            {
+                Toast.makeText(this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, getResources().getString(R.string.substplan_no_subst), Toast.LENGTH_LONG).show();
+            }
+
         }
 
 

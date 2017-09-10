@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -59,12 +60,14 @@ public class LoadingActivity extends AppCompatActivity implements
         // Login is not saved in SharedPrefs or login is wrong -> no direct login
         targetClass = LoginActivity.class;
 
+        Log.d(TAG, "Checking login...");
         if(AccountManager.getInstance().isValidLogin(this))
         {
             // Login is saved in SharedPrefs -> direct login
             targetClass = MainActivity.class;
         }
 
+        Log.d(TAG, "Starting " + targetClass.getSimpleName());
         Intent i = new Intent(LoadingActivity.this, targetClass);
         startActivity(i);
         finish();

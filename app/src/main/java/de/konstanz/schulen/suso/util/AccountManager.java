@@ -109,7 +109,7 @@ public class AccountManager {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
 
