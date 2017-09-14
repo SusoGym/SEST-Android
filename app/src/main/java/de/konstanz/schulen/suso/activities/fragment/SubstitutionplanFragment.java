@@ -63,7 +63,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
                 TextView dateView = new TextView(substitutionplanContent.getContext());
                 dateView.setGravity(Gravity.CENTER);
                 dateView.setText(getDate(dateKey));
-                dateView.setTextSize(30f);
+                dateView.setTextSize(27f);
                 lp.setMargins(0, 70, 0, 30);
                 lp.gravity = Gravity.CENTER;
                 dateView.setLayoutParams(lp);

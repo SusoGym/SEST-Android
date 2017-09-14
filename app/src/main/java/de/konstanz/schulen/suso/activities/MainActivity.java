@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.crashlytics.android.answers.Answers;
@@ -239,6 +240,7 @@ public class MainActivity extends AppCompatActivity
             return;
 
         SubstitutionplanFragment f = (SubstitutionplanFragment)currentFragment;
+        LinearLayout substitutionplanContent = (LinearLayout) findViewById(R.id.content_substitutionplan);
 
         try {
 
@@ -247,6 +249,7 @@ public class MainActivity extends AppCompatActivity
             f.displaySubsitutionplan(coverLessons);
 
         } catch (JSONException e) {
+            substitutionplanContent.removeAllViews();
             Log.e(TAG, "Error while trying to display substitutions: " + e.getMessage());
             f.displayNoSubstitution();
 
