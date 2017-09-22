@@ -17,7 +17,7 @@ public class SusoApplication extends Application {
 
     public static final String TAG = SusoApplication.class.getSimpleName();
 
-    public static boolean USE_FABRIC = !BuildConfig.DEBUG_MODE;
+    public static boolean USE_FABRIC = true;
 
     @Override
     public void onCreate() {
@@ -28,7 +28,7 @@ public class SusoApplication extends Application {
 
         String testLab = Settings.System.getString(getContentResolver(), "firebase.test.lab");
 
-        if(testLab != null && testLab.equals("true"))
+        if(testLab != null && testLab.equals("true") || BuildConfig.DEBUG_MODE)
         {
             USE_FABRIC = false; // we are in an testing environment
             Log.i(TAG, "Welcome Testing!");

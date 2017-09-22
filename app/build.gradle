@@ -65,22 +65,17 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "Boolean", "DEBUG_MODE", "false"
             signingConfig signingConfigs.config
         }
-        demo {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "Boolean", "DEBUG_MODE", "false"
-            signingConfig signingConfigs.config
-            versionNameSuffix "-demo"
-        }
+
         debug {
             buildConfigField "Boolean", "DEBUG_MODE", "true"
             signingConfig signingConfigs.config
             versionNameSuffix "-debug"
+            applicationIdSuffix ".debug"
         }
     }
 }
