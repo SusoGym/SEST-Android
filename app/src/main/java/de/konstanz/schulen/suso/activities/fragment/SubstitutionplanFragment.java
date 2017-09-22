@@ -2,18 +2,27 @@ package de.konstanz.schulen.suso.activities.fragment;
 
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,27 +36,54 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.SusoApplication;
 import de.konstanz.schulen.suso.activities.MainActivity;
+import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
+import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.util.Callback;
+import de.konstanz.schulen.suso.util.FabricHandler;
+import de.konstanz.schulen.suso.util.SharedPreferencesManager;
+
+import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA;
 
 public class SubstitutionplanFragment extends AbstractFragment {
 
+    private static final String TAG = SubstitutionplanFragment.class.getSimpleName();
+    private SwipeRefreshLayout swipeContainer;
+
     public SubstitutionplanFragment() {
         super(R.layout.fragment_substitutionplan, R.id.nav_substitutionplan, R.string.nav_substitutionplan);
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+        swipeContainer = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipeContainerSubstitutionplan);
+    }
+
+    @Override
+    public void onPushToForeground() {
+        showSubstitutionplan();
     }
 
     @Override
     public void refresh() {
-        if (!(getActivity() instanceof MainActivity))
-            return;
-
-        MainActivity a = (MainActivity) getActivity();
-
-        a.updateSubstitutionplan();
+        updateSubstitutionplan();
     }
 
     public void displaySubsitutionplan(JSONObject coverLessons) {
 
         LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.content_substitutionplan);
+
+        if(substitutionplanContent == null)
+        {
+            Log.i(TAG, "Error while trying to display Subsitutionplan: Layout is null; This is fine tho");
+            return;
+        }
+
         substitutionplanContent.removeAllViews();
 
         try {
@@ -296,5 +332,65 @@ public class SubstitutionplanFragment extends AbstractFragment {
         }
     }
 
+
+    private void showSubstitutionplan() {
+
+        String savedSubstitutionplanData = SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, null);
+        if (savedSubstitutionplanData != null) {
+            displaySubstitutionplan(savedSubstitutionplanData);
+        }
+
+        updateSubstitutionplan();
+    }
+
+    public void updateSubstitutionplan() {
+        SubstitutionplanFetcher.fetchAsync(AccountManager.getInstance().getUsername(), AccountManager.getInstance().getPassword(), getActivity(), new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
+            @Override
+            public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
+                boolean success = true;
+                if (request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK) {
+                    String json = request.getPayload();
+                    if (!SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, "").equals(json)) {
+                        SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).apply();
+                        displaySubstitutionplan(json);
+                    }
+                } else {
+                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getStatusCode() + "/" + request.getPayload());
+                    success = false;
+                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
+                }
+
+                FabricHandler.logCustomEvent(new CustomEvent("Reloaded Substitutionplan").putCustomAttribute("success", success + ""));
+
+                swipeContainer.setRefreshing(false);
+            }
+        });
+    }
+
+    private void displaySubstitutionplan(String json) {
+
+        LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.content_substitutionplan);
+
+        try {
+
+            JSONObject jsonObject = new JSONObject(json);
+            JSONObject coverLessons = jsonObject.getJSONObject("coverlessons");
+            displaySubsitutionplan(coverLessons);
+
+        } catch (JSONException e) {
+            substitutionplanContent.removeAllViews();
+            Log.e(TAG, "Error while trying to display substitutions: " + e.getMessage());
+            displayNoSubstitution();
+
+            if (!e.getMessage().contains("Value [] at coverlessons")) {
+                Toast.makeText(getActivity(), getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), getResources().getString(R.string.substplan_no_subst), Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+
+    }
 
 }

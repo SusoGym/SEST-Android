@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.util.Callback;
+import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.IOUtility;
 import de.konstanz.schulen.suso.util.ThreadHandler;
 import lombok.Getter;
@@ -68,14 +69,12 @@ public class SubstitutionplanFetcher
 
             URL url = new URL(ctx.getString(R.string.base_url) + "index.php?type=vplan&user=" + username + "&pwd=" + password + "&console");
 
-            if(BuildConfig.DEBUG_MODE) {
-                Log.d(TAG, "Trying to fetch substitution data from " + url.toExternalForm());
-            }
+            DebugUtil.infoLog(TAG, "Trying to fetch substitution data from " + url.toExternalForm());
 
             String data = IOUtility.readFromURL(url)
                     .replace("ï»¿", "");
 
-            Log.d(TAG, "Successfully fetched data! ");
+            DebugUtil.infoLog(TAG, "Successfully fetched data! ");
 
             if(data.contains("Invalid userdata!"))
             {

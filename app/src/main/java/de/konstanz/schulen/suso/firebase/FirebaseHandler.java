@@ -16,6 +16,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.IOUtility;
 
 public class FirebaseHandler {
@@ -40,7 +41,7 @@ public class FirebaseHandler {
     }
 
     public void sendRegistrationToServer(String token) {
-        Log.d(TAG, "Refreshed token: " + token);
+        DebugUtil.infoLog(TAG, "Refreshed token: " + token);
         this.token = token;
         registerToken();
 
@@ -48,7 +49,7 @@ public class FirebaseHandler {
 
     public void sendMessageReceived(RemoteMessage msg) {
 
-        Log.d(TAG, "Incoming message from " + msg.getFrom() + ", payload: " + msg.getData() + (msg.getNotification() != null ? ", title: " + msg.getNotification().getTitle() + ", body: " + msg.getNotification().getBody() : ""));
+        DebugUtil.infoLog(TAG, "Incoming message from " + msg.getFrom() + ", payload: " + msg.getData() + (msg.getNotification() != null ? ", title: " + msg.getNotification().getTitle() + ", body: " + msg.getNotification().getBody() : ""));
 
         if (msg.getNotification() == null) { // data incoming
 
@@ -72,7 +73,7 @@ public class FirebaseHandler {
 
     public void startup(final Context ctx) {
         if (FirebaseInstanceId.getInstance().getToken() != null) {
-            Log.d(TAG, "Firebase-Token is: " + FirebaseInstanceId.getInstance().getToken());
+            DebugUtil.infoLog(TAG, "Firebase-Token is: " + FirebaseInstanceId.getInstance().getToken());
             token = FirebaseInstanceId.getInstance().getToken();
 
             new Thread()
@@ -82,7 +83,7 @@ public class FirebaseHandler {
                     try {
                         boolean registered = isRegistered(token);
                         boolean validLogin = AccountManager.getInstance().isValidLogin(ctx);
-                        Log.d(TAG, "Token registered: " + registered + "; Valid login: " + validLogin);
+                        DebugUtil.infoLog(TAG, "Token registered: " + registered + "; Valid login: " + validLogin);
                         if (!registered && validLogin) {
                             registerToken();
                         }
@@ -116,11 +117,11 @@ public class FirebaseHandler {
                         registerVerification2 = null;
 
                         String verification1 = sendRegisterRequest(userId, userType, token);
-                        Log.d(TAG, "Verification Code 1: " + verification1);
+                        DebugUtil.infoLog(TAG, "Verification Code 1: " + verification1);
                         while (registerVerification2 == null) ;
-                        Log.d(TAG, "Verification Code 2: " + registerVerification2);
+                        DebugUtil.infoLog(TAG, "Verification Code 2: " + registerVerification2);
 
-                        Log.d(TAG, "Sending verification request with verify1: " + verification1 + " / verify2: " + registerVerification2);
+                        DebugUtil.infoLog(TAG, "Sending verification request with verify1: " + verification1 + " / verify2: " + registerVerification2);
                         success = sendRegisterToken(userId, userType, token, verification1, registerVerification2);
 
                     }
@@ -157,11 +158,11 @@ public class FirebaseHandler {
                         deleteVerification2 = null;
 
                         String verification1 = sendDeletionRequest(token);
-                        Log.d(TAG, "Verification Code 1: " + verification1);
+                        DebugUtil.infoLog(TAG, "Verification Code 1: " + verification1);
                         while (deleteVerification2 == null) ;
-                        Log.d(TAG, "Verification Code 2: " + deleteVerification2);
+                        DebugUtil.infoLog(TAG, "Verification Code 2: " + deleteVerification2);
 
-                        Log.d(TAG, "Sending verification request with verify1: " + verification1 + " / verify2: " + deleteVerification2);
+                        DebugUtil.infoLog(TAG, "Sending verification request with verify1: " + verification1 + " / verify2: " + deleteVerification2);
                         success = sendDeletionToken(token, verification1, deleteVerification2);
 
                     }
@@ -201,7 +202,7 @@ public class FirebaseHandler {
         JSONObject o = new JSONObject(resp);
         boolean success = o.getJSONObject("payload").getBoolean("success");
 
-        Log.d(TAG, "Success of verification: " + success);
+        DebugUtil.infoLog(TAG, "Success of verification: " + success);
 
         if (!success) {
             Log.e(TAG, "Not successful! \n" + resp);
@@ -222,7 +223,8 @@ public class FirebaseHandler {
         JSONObject o = new JSONObject(resp);
         boolean success = o.getJSONObject("payload").getBoolean("success");
 
-        Log.d(TAG, "Success of verification: " + success);
+
+        DebugUtil.infoLog(TAG, "Success of verification: " + success);
 
         if (!success) {
             Log.e(TAG, "Not successful! \n" + resp);

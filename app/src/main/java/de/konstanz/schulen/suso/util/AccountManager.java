@@ -1,10 +1,13 @@
 package de.konstanz.schulen.suso.util;
 
 import android.content.Context;
+import android.net.Credentials;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+
+import com.google.android.gms.auth.api.credentials.Credential;
 
 import org.json.JSONObject;
 
@@ -139,6 +142,11 @@ public class AccountManager {
     public AccountManager setPassword(@NonNull String password) {
         this.password = password;
         return this;
+    }
+
+    public Credential getCredentials()
+    {
+        return new Credential.Builder(this.username).setPassword(this.password).build();
     }
 
     public void logout() {

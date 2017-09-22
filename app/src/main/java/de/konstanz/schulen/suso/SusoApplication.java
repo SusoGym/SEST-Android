@@ -6,23 +6,23 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
-import io.fabric.sdk.android.Fabric;
 
 public class SusoApplication extends Application {
 
     public static final String TAG = SusoApplication.class.getSimpleName();
+    public static String API_ENDPOINT = null;
 
-    public static boolean USE_FABRIC = true;
 
     @Override
     public void onCreate() {
 
         Log.i(TAG, "Starting Suso App...");
+
+        API_ENDPOINT = getString(R.string.base_url);
 
         SharedPreferencesManager.initialize(this);
 
@@ -30,13 +30,11 @@ public class SusoApplication extends Application {
 
         if(testLab != null && testLab.equals("true") || BuildConfig.DEBUG_MODE)
         {
-            USE_FABRIC = false; // we are in an testing environment
+            FabricHandler.USE_FABRIC = false; // we are in an testing environment
             Log.i(TAG, "Welcome Testing!");
         }
 
-        if(USE_FABRIC) {
-            Fabric.with(this, new Crashlytics());
-        }
+        FabricHandler.initialize(this);
 
         CharSequence text = "Version: " + BuildConfig.VERSION_NAME + "/" + BuildConfig.GIT_HASH + "(" + BuildConfig.GIT_COMMITS + ")";
 
@@ -54,7 +52,7 @@ public class SusoApplication extends Application {
 
         AccountManager.getInstance().loadFromSharedPreferences(this);
 
-        FirebaseHandler.getInstance().setEndPoint(getString(R.string.base_url));
+        FirebaseHandler.getInstance().setEndPoint(API_ENDPOINT);
         FirebaseHandler.getInstance().startup(this);
 
         Log.i(TAG, "Successfully started Suso App");

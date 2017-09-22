@@ -16,9 +16,7 @@ public class IOUtility {
 
     public static String readFromURL(URL url) throws IOException {
 
-        if (BuildConfig.DEBUG_MODE) {
-            Log.d(TAG, "Reading content from " + url);
-        }
+        DebugUtil.infoLog(TAG, "Reading content from " + url);
         BufferedReader is = new BufferedReader(new InputStreamReader(url.openStream()));
 
         String temp;

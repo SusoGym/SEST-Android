@@ -81,6 +81,9 @@ public abstract class AbstractFragment extends Fragment {
         return inflater.inflate(layoutId, container, false);
     }
 
+
+    public abstract void onPushToForeground();
+
     public int getNavigationId() {
         return navigationId;
     }

@@ -20,6 +20,7 @@ import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 import io.fabric.sdk.android.Fabric;
 
@@ -60,14 +61,14 @@ public class LoadingActivity extends AppCompatActivity implements
         // Login is not saved in SharedPrefs or login is wrong -> no direct login
         targetClass = LoginActivity.class;
 
-        Log.d(TAG, "Checking login...");
+        DebugUtil.infoLog(TAG, "Checking login...");
         if(AccountManager.getInstance().isValidLogin(this))
         {
             // Login is saved in SharedPrefs -> direct login
             targetClass = MainActivity.class;
         }
 
-        Log.d(TAG, "Starting " + targetClass.getSimpleName());
+        DebugUtil.infoLog(TAG, "Starting " + targetClass.getSimpleName());
         Intent i = new Intent(LoadingActivity.this, targetClass);
         startActivity(i);
         finish();

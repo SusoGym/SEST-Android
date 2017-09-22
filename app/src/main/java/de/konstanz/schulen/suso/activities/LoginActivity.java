@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
-import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.LoginEvent;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
@@ -29,10 +28,11 @@ import com.google.android.gms.common.api.Status;
 
 import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
-import de.konstanz.schulen.suso.SusoApplication;
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.Callback;
+import de.konstanz.schulen.suso.util.DebugUtil;
+import de.konstanz.schulen.suso.util.FabricHandler;
 
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener,
@@ -79,9 +79,8 @@ public class LoginActivity extends AppCompatActivity
                         break;
                 }
 
-                if (SusoApplication.USE_FABRIC) {
-                    Answers.getInstance().logLogin(new LoginEvent().putMethod(smartLock ? "smartLock" : "manual").putSuccess(success));
-                }
+
+                FabricHandler.logLoginEvent(new LoginEvent().putMethod(smartLock ? "smartLock" : "manual").putSuccess(success));
 
                 if (!success) {
                     requestCredentials();
@@ -136,7 +135,7 @@ public class LoginActivity extends AppCompatActivity
                 username = password = "Oberstufe";
             }
 
-            Log.d("LoginActivity", "Login try with: ['" + username + "', '" + password + "']");
+            DebugUtil.infoLog("LoginActivity", "Login try with: ['" + username + "', '" + password + "']");
         }
 
         if (username.equals("") || password.equals("")) {
@@ -150,7 +149,7 @@ public class LoginActivity extends AppCompatActivity
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        DebugUtil.infoLog(TAG, "onConnectionFailed:" + connectionResult);
     }
 
     @Override
@@ -177,7 +176,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     private void smartLockOnActivity(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+        DebugUtil.infoLog(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
 
         switch (requestCode) {
             case RC_READ:
@@ -192,7 +191,7 @@ public class LoginActivity extends AppCompatActivity
                 break;
             case RC_SAVE:
                 if (resultCode == RESULT_OK) {
-                    Log.d(TAG, "Credential Save: OK");
+                    DebugUtil.infoLog(TAG, "Credential Save: OK");
                 } else {
                     Log.e(TAG, "Credential Save: NOT OK");
                 }
@@ -203,7 +202,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     private void saveCredentialToSmartLock(String user, String pwd) {
-        Log.d(TAG, "Saving Credential:" + user + ":" + anonymizePassword(pwd));
+        DebugUtil.infoLog(TAG, "Saving Credential:" + user + ":" + anonymizePassword(pwd));
         final Credential credential = new Credential.Builder(user)
                 .setPassword(pwd)
                 .build();
@@ -218,12 +217,12 @@ public class LoginActivity extends AppCompatActivity
                 new ResolvingResultCallbacks<Status>(this, RC_SAVE) {
                     @Override
                     public void onSuccess(@NonNull Status status) {
-                        Log.d(TAG, "Credential saved");
+                        DebugUtil.infoLog(TAG, "Credential saved");
                     }
 
                     @Override
                     public void onUnresolvableFailure(@NonNull Status status) {
-                        Log.d(TAG, "Save Failed:" + status);
+                        DebugUtil.infoLog(TAG, "Save Failed:" + status);
                     }
                 });
     }
@@ -275,9 +274,9 @@ public class LoginActivity extends AppCompatActivity
             return;
         }
 
-        Log.d(TAG, "Resolving: " + status);
+        DebugUtil.infoLog(TAG, "Resolving: " + status);
         if (status.hasResolution()) {
-            Log.d(TAG, "STATUS: RESOLVING");
+            DebugUtil.infoLog(TAG, "STATUS: RESOLVING");
             try {
                 status.startResolutionForResult(LoginActivity.this, requestCode);
                 mIsResolving = true;
@@ -295,7 +294,7 @@ public class LoginActivity extends AppCompatActivity
      * @param credential the Credential to process.
      */
     private void processRetrievedCredential(Credential credential) {
-        Log.d(TAG, "Credential Retrieved: " + credential.getId() + ":" +
+        DebugUtil.infoLog(TAG, "Credential Retrieved: " + credential.getId() + ":" +
                 anonymizePassword(credential.getPassword()));
 
         checkLogin(credential.getId(), credential.getPassword(), true);

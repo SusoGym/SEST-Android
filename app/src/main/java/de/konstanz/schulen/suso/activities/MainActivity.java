@@ -17,39 +17,34 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.HashMap;
 
-
-import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
-import de.konstanz.schulen.suso.SusoApplication;
 import de.konstanz.schulen.suso.activities.fragment.AbstractFragment;
+import de.konstanz.schulen.suso.activities.fragment.BlogFragment;
 import de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment;
-import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.util.AccountManager;
-import de.konstanz.schulen.suso.util.Callback;
+import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
-import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     static {
         // We need to register our AbstractFragments here
-        AbstractFragment.registerFragment(SubstitutionplanFragment.class);
+        AbstractFragment.registerFragment(SubstitutionplanFragment.class, BlogFragment.class);
         // Do we have some drawer items that are not connected with an AbstractFragment? Add them here
         AbstractFragment.registerSpecialNavigationElement(R.id.nav_logout);
     }
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    private HashMap<Class<? extends AbstractFragment>, AbstractFragment> fragments = new HashMap<>();
 
     private SharedPreferences sharedPreferences = SharedPreferencesManager.getSharedPreferences();
 
@@ -80,13 +75,6 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        AbstractFragment.setMasterActivity(this);
-
-        //Add the view fragment
-        setActiveFragment(SubstitutionplanFragment.class);
-
-        navigationView.setCheckedItem(currentFragment.getNavigationId());
-
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -99,59 +87,77 @@ public class MainActivity extends AppCompatActivity
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        AbstractFragment.setMasterActivity(this);
+
+        //Add the view fragment
+        setActiveFragment(SubstitutionplanFragment.class);
+
+        navigationView.setCheckedItem(currentFragment.getNavigationId());
+
         disableUnknownNavItems();
 
     }
 
-    public void disableUnknownNavItems()
-    {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        currentFragment.onPushToForeground();
+    }
+
+    public void disableUnknownNavItems() {
         Menu menu = navigationView.getMenu();
 
-        for(int i = 0; i < menu.size(); i++)
-        {
+        for (int i = 0; i < menu.size(); i++) {
             MenuItem mI = menu.getItem(i);
 
-            if(!AbstractFragment.isValid(mI.getItemId()))
+            if (!AbstractFragment.isValid(mI.getItemId()))
                 mI.setEnabled(false);
         }
     }
 
 
-    public void setActiveFragment(Class<? extends AbstractFragment> fragment)
-    {
+    public void setActiveFragment(Class<? extends AbstractFragment> fragment) {
 
-        Log.d(TAG, "Setting ActiveFragment to instance of " + fragment.getCanonicalName());
+        DebugUtil.infoLog(TAG, "Setting ActiveFragment to instance of " + fragment.getCanonicalName());
 
         AbstractFragment frgmt;
-        try{
-            frgmt = fragment.newInstance();
-        }catch (Exception e){
-            e.printStackTrace();
-            return;
+        boolean exists = false;
+
+        if (fragments.containsKey(fragment)) {
+            frgmt = fragments.get(fragment);
+            exists = true;
+        } else {
+
+            try {
+                frgmt = fragment.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
         }
 
         fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        if(currentFragment == null)
-        {
-            transaction.replace(R.id.content_main, frgmt);
-        } else {
-            transaction.add(R.id.content_main, frgmt);
-        }
+        transaction.replace(R.id.content_main, frgmt);
 
         currentFragment = frgmt;
 
         transaction.commit();
         fragmentManager.executePendingTransactions();
 
+        if (!exists) {
+            fragments.put(fragment, frgmt);
+        }
+
+        frgmt.onPushToForeground();
+
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
 
         super.onStart();
-        showSubstitutionplan();
     }
 
 
@@ -172,15 +178,12 @@ public class MainActivity extends AppCompatActivity
 
         Class<? extends AbstractFragment> clazz = AbstractFragment.getByNavbarItem(id);
 
-        if(currentFragment.getNavigationId() == id)
-        { // if choose current selected fragment -> reload
+        if (currentFragment.getNavigationId() == id) { // if choose current selected fragment -> reload
             currentFragment.refresh();
 
-        } else if(clazz != null)
-        { // selected new fragment
+        } else if (clazz != null) { // selected new fragment
             setActiveFragment(clazz);
-        } else if(id==R.id.nav_logout)
-        { // selected logged out TODO: add smoother way of handling this
+        } else if (id == R.id.nav_logout) { // selected logged out TODO: add smoother way of handling this
             AccountManager.getInstance().logout();
 
             Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
@@ -197,71 +200,4 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void showSubstitutionplan(){
-
-        String savedSubstitutionplanData = sharedPreferences.getString(SHR_SUBSITUTIONPLAN_DATA, null);
-        if (savedSubstitutionplanData != null) {
-            displaySubstitutionplan(savedSubstitutionplanData);
-        }
-
-        updateSubstitutionplan();
-    }
-
-    public void updateSubstitutionplan(){
-        SubstitutionplanFetcher.fetchAsync(AccountManager.getInstance().getUsername(), AccountManager.getInstance().getPassword(), this, new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
-            @Override
-            public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
-                boolean success = true;
-                if(request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK)
-                {
-                    String json = request.getPayload();
-                    if(!sharedPreferences.getString(SHR_SUBSITUTIONPLAN_DATA, "").equals(json))
-                    {
-                        sharedPreferences.edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).apply();
-                        displaySubstitutionplan(json);
-                    }
-                } else {
-                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getStatusCode() + "/" + request.getPayload());
-                    success = false;
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
-                }
-                if(SusoApplication.USE_FABRIC)
-                {
-                    Answers.getInstance().logCustom(new CustomEvent("Reloaded Substitutionplan").putCustomAttribute("success", success + ""));
-                }
-                swipeContainer.setRefreshing(false);
-            }
-        });
-    }
-
-    private void displaySubstitutionplan(String json){
-
-        if(!(currentFragment instanceof SubstitutionplanFragment))
-            return;
-
-        SubstitutionplanFragment f = (SubstitutionplanFragment)currentFragment;
-        LinearLayout substitutionplanContent = (LinearLayout) findViewById(R.id.content_substitutionplan);
-
-        try {
-
-            JSONObject jsonObject = new JSONObject(json);
-            JSONObject coverLessons = jsonObject.getJSONObject("coverlessons");
-            f.displaySubsitutionplan(coverLessons);
-
-        } catch (JSONException e) {
-            substitutionplanContent.removeAllViews();
-            Log.e(TAG, "Error while trying to display substitutions: " + e.getMessage());
-            f.displayNoSubstitution();
-
-            if(!e.getMessage().contains("Value [] at coverlessons"))
-            {
-                Toast.makeText(this, getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, getResources().getString(R.string.substplan_no_subst), Toast.LENGTH_LONG).show();
-            }
-
-        }
-
-
-    }
 }
