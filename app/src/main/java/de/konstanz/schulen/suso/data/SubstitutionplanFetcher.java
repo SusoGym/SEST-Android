@@ -5,16 +5,13 @@ import android.util.Log;
 
 import com.google.android.gms.auth.api.credentials.Credential;
 
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import de.konstanz.schulen.suso.BuildConfig;
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.DebugUtil;

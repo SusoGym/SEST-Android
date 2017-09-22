@@ -1,11 +1,9 @@
 package de.konstanz.schulen.suso.util;
 
 import android.content.Context;
-import android.net.Credentials;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 
 import com.google.android.gms.auth.api.credentials.Credential;
 
@@ -15,8 +13,12 @@ import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import lombok.Getter;
 
-import static de.konstanz.schulen.suso.util.SharedPreferencesManager.*;
-import static de.konstanz.schulen.suso.data.SubstitutionplanFetcher.SubstitutionplanResponse.*;
+import static de.konstanz.schulen.suso.data.SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_INVALID_DATA;
+import static de.konstanz.schulen.suso.data.SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_INVALID_USER;
+import static de.konstanz.schulen.suso.data.SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_NETWORK_ERROR;
+import static de.konstanz.schulen.suso.data.SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK;
+import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_PASSWORD;
+import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_USERNAME;
 
 public class AccountManager {
 

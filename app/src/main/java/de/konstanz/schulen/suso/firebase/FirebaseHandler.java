@@ -12,8 +12,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.DebugUtil;

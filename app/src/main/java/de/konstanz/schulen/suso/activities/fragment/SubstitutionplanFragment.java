@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -20,7 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 
 import org.json.JSONArray;
@@ -36,8 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.konstanz.schulen.suso.R;
-import de.konstanz.schulen.suso.SusoApplication;
-import de.konstanz.schulen.suso.activities.MainActivity;
 import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.Callback;

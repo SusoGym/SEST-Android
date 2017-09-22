@@ -1,8 +1,6 @@
 package de.konstanz.schulen.suso.firebase.services;
 
 
-import android.util.Log;
-
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
