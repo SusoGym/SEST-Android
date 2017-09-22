@@ -145,6 +145,7 @@ public class AccountManager {
         Log.i(TAG, "Logging out...");
         username = null;
         password = null;
+        saveToSharedPreferences();
         FirebaseHandler.getInstance().deleteToken();
     }
 
