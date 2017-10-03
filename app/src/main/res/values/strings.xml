@@ -40,5 +40,6 @@
     <string name="login_error">An error occurred while trying to log in.</string>
     <string name="nav_blog">Blog</string>
     <string name="substplan_no_subst">At the moment there are no substitutions.</string>
+    <string name="no_blog_posts">No blog posts</string>
 
 </resources>
