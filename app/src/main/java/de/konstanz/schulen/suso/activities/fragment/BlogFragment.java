@@ -1,5 +1,7 @@
 package de.konstanz.schulen.suso.activities.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,7 +9,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -19,17 +20,16 @@ import android.widget.TextView;
 
 import com.crashlytics.android.answers.CustomEvent;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.activities.BlogPostActivity;
 import de.konstanz.schulen.suso.data.Blog;
 import de.konstanz.schulen.suso.data.BlogFetcher;
 import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.Callback;
-import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.FabricHandler;
 
 
@@ -168,7 +168,7 @@ public class BlogFragment extends AbstractFragment {
             if(view==null || !(view instanceof RelativeLayout) || !(view.getId()==R.id.list_item_blog_view))
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_blog, parent, false);
 
-            Blog.Post post = blogPosts.get(i);
+            final Blog.Post post = blogPosts.get(i);
 
 
             TextView titleView = (TextView) view.findViewById(R.id.blog_post_title);
@@ -179,11 +179,15 @@ public class BlogFragment extends AbstractFragment {
             authorView.setText(post.getAuthor().getDisplayName());
             dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getReleaseDate()));
 
-            view.setOnTouchListener(new View.OnTouchListener() {
+
+            view.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    //TODO Show post view
-                    return false;
+                public void onClick(View view) {
+                    Activity activity = (Activity) view.getContext();
+                    Intent intent = new Intent(activity, BlogPostActivity.class);
+                    intent.putExtra(BlogPostActivity.POST_EXTRA, post);
+                    activity.startActivity(intent);
+                    activity.overridePendingTransition(R.anim.slide_in_from_right, R.anim.stay_fixed);
                 }
             });
 
