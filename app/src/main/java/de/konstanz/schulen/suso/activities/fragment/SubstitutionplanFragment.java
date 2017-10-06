@@ -187,6 +187,13 @@ public class SubstitutionplanFragment extends AbstractFragment {
         return dayOfWeek + ", " + writeFormat.format(calendar.getTime());
     }
 
+
+
+
+
+
+
+
     private static class SubstitutionDataAdapter extends RecyclerView.Adapter {
         private List<SubstitutionData> substitutions;
 
