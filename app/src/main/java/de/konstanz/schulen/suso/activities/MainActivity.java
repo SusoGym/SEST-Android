@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         navigationDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainerSubstitutionplan);
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshContainer);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
 
 

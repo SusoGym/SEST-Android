@@ -57,7 +57,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
         super.onCreate(savedInstanceState);
 
 
-        swipeContainer = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipeContainerSubstitutionplan);
+        swipeContainer = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipeRefreshContainer);
     }
 
     @Override
