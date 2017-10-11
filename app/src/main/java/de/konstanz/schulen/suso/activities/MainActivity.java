@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     static {
         // We need to register our AbstractFragments here
-        AbstractFragment.registerFragment(SubstitutionplanFragment.class, BlogFragment.class);
+        AbstractFragment.registerFragment(SubstitutionplanFragment.class);
         // Do we have some drawer items that are not connected with an AbstractFragment? Add them here
         AbstractFragment.registerSpecialNavigationElement(R.id.nav_logout);
     }

@@ -1,21 +1,13 @@
 package de.konstanz.schulen.suso.activities;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
-import android.util.Log;
-import android.view.Display;
-import android.view.WindowManager;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.Logger;
 
 import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.data.Blog;
@@ -28,7 +20,7 @@ public class BlogPostActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_blog_post);
+        setContentView(R.layout.blog_large_post);
 
         post = getIntent().getParcelableExtra(POST_EXTRA);
 

@@ -2,10 +2,8 @@ package de.konstanz.schulen.suso.activities.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,11 +13,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.answers.CustomEvent;
@@ -45,7 +39,7 @@ public class BlogFragment extends AbstractFragment {
 
 
     public BlogFragment() {
-        super(R.layout.fragment_blog, R.id.nav_blog, R.string.nav_blog);
+        super(R.layout.blog_fragment, R.id.nav_blog, R.string.nav_blog);
     }
 
     @Override
@@ -167,7 +161,7 @@ public class BlogFragment extends AbstractFragment {
         public BlogViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.
                     from(parent.getContext()).
-                    inflate(R.layout.list_item_blog, parent, false);
+                    inflate(R.layout.blog_list_items, parent, false);
             return new BlogViewHolder(itemView);
         }
 
