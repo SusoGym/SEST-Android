@@ -18,7 +18,7 @@
     <string name="substcard_subject">Fach:</string>
     <string name="substcard_teacher">Lehrer:</string>
     <string name="substplan_json_error">Fehler beim Auslesen des Vertretungsplans (JSON). Daten sind möglicherweise unvollständig oder fehlerhaft</string>
-    <string name="substplan_network_error">Vertretungsplan konnte nicht heruntergeladen werden. Bitte überprüfe deine Internetverbinung</string>
+    <string name="substplan_network_error">Vertretungsplan konnte nicht heruntergeladen werden. Der letzte verfügbare Stand wird angezeigt</string>
     <string name="nav_substitutionplan">Vertretungsplan</string>
     <string name="login_header">Bitte mit den Novell Daten anmelden</string>
     <string name="nav_logout">Abmelden</string>

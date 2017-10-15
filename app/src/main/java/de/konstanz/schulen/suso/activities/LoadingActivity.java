@@ -7,14 +7,17 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment;
 import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.DebugUtil;
+import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
 public class LoadingActivity extends AppCompatActivity implements
         Runnable
@@ -56,6 +59,11 @@ public class LoadingActivity extends AppCompatActivity implements
         {
             // Login is saved in SharedPrefs -> direct login
             targetClass = MainActivity.class;
+        }else{
+            //Enable offline viewing of substitution plan
+            if(SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA, null)!=null){
+                targetClass = MainActivity.class;
+            }
         }
 
         DebugUtil.infoLog(TAG, "Starting " + targetClass.getSimpleName());

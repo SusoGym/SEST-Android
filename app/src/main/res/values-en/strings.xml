@@ -17,7 +17,7 @@
     <string name="substcard_subject">Subject:</string>
     <string name="substcard_teacher">Teacher:</string>
     <string name="substplan_json_error">Error while trying to read substitution data. Data may be incorrect</string>
-    <string name="substplan_network_error">Wasn\'t able to download Substitutionplan. Please check your internetconnection</string>
+    <string name="substplan_network_error">Unable able to download Substitutionplan. Please check your internet connection</string>
     <string name="nav_substitutionplan">Substitutionplan</string>
     <string name="nav_logout">Logout</string>
     <string name="login_header">Please login with your Novell credentials</string>
