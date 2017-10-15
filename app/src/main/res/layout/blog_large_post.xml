@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.konstanz.schulen.suso.activities.BlogPostActivity">
+
+    <TextView
+        android:id="@+id/post_activity_title"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:textSize="40sp"
+        tools:text="Title"/>
+
+    <LinearLayout
+        android:id="@+id/post_activity_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_activity_title"
+        android:paddingEnd="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingStart="10dp"
+        >
+
+        <TextView
+            android:id="@+id/post_activity_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:textStyle="italic"
+            tools:text = "Author"/>
+
+        <TextView
+            android:id="@+id/post_activity_date"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:textStyle="italic"
+            android:textAlignment="viewEnd"
+            android:layout_gravity="end"
+            tools:text = "Date"/>
+
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/post_activity_body"
+
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/post_activity_subtitle"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="20dp"
+        android:textSize="20sp"
+        tools:text = "sad"/>
+</RelativeLayout>

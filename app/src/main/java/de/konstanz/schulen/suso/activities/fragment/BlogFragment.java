@@ -2,20 +2,18 @@ package de.konstanz.schulen.suso.activities.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.answers.CustomEvent;
@@ -41,14 +39,14 @@ public class BlogFragment extends AbstractFragment {
 
 
     public BlogFragment() {
-        super(R.layout.fragment_blog, R.id.nav_blog, R.string.nav_blog);
+        super(R.layout.blog_fragment, R.id.nav_blog, R.string.nav_blog);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        swipeContainer = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipeContainerSubstitutionplan);
+        swipeContainer = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipeRefreshContainer);
     }
 
     @Override
@@ -58,7 +56,6 @@ public class BlogFragment extends AbstractFragment {
 
     @Override
     public void refresh() {
-        boolean success = true;
 
         BlogFetcher.getFetcher().setCredentials(AccountManager.getInstance().getCredentials()).setAction(BlogFetcher.Fetcher.Action.FETCH_POSTS).
                 performAsync(new Callback<BlogFetcher.Response>() {
@@ -67,27 +64,31 @@ public class BlogFragment extends AbstractFragment {
                         swipeContainer.setRefreshing(false);
 
 
+                        boolean success = true;
+
                         if (response instanceof BlogFetcher.Error) {
                             Log.e(TAG, "Error while trying to fetch blog posts: " + ((BlogFetcher.Error) response).getError());
+                            success = false;
                         } else if (response instanceof BlogFetcher.FetchPostsResult) {
                             displayContent(((BlogFetcher.FetchPostsResult) response).getPosts());
-                            return;
+                            success = true;
                         }
 
-                        displayNoEntries();
+                        FabricHandler.logCustomEvent(new CustomEvent("Reloaded BlogFetcher").putCustomAttribute("success", success + ""));
 
+                        if (!success) {
+                            displayNoEntries();
+                        }
 
                     }
                 }, getActivity());
 
 
-        FabricHandler.logCustomEvent(new CustomEvent("Reloaded BlogFetcher").putCustomAttribute("success", success + ""));
-
     }
 
     public void displayNoEntries() {
 
-        FrameLayout blogFrame = (FrameLayout) getActivity().findViewById(R.id.blog_frame);
+        RecyclerView blogFrame = (RecyclerView) getActivity().findViewById(R.id.blog_frame);
 
         TextView infoView = new TextView(blogFrame.getContext());
         infoView.setText(R.string.no_blog_posts);
@@ -100,114 +101,75 @@ public class BlogFragment extends AbstractFragment {
     }
 
     public void displayContent(ArrayList<Blog.Post> posts) {
-        FrameLayout blogFrame = (FrameLayout) getActivity().findViewById(R.id.blog_frame);
+        RecyclerView blogFrame = (RecyclerView) getActivity().findViewById(R.id.blog_frame);
 
-        blogFrame.removeAllViews();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        blogFrame.setLayoutManager(layoutManager);
 
-        ListView postView = new ListView(getActivity());
         BlogPostAdapter adapter = new BlogPostAdapter(posts);
 
-        postView.setAdapter(adapter);
-
-        blogFrame.addView(postView);
+        blogFrame.setAdapter(adapter);
+        blogFrame.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
 
     }
 
+    public static class BlogViewHolder extends RecyclerView.ViewHolder{
 
+        protected TextView titleView, authorView, dateView;
 
-    public static class BlogPostAdapter implements ListAdapter{
-        private List<Blog.Post> blogPosts;
-
-
-        public BlogPostAdapter(List<Blog.Post> blogPosts){
-            this.blogPosts = blogPosts;
+        public BlogViewHolder(View v) {
+            super(v);
+            titleView = (TextView) v.findViewById(R.id.blog_post_title);
+            authorView = (TextView) v.findViewById(R.id.blog_post_author);
+            dateView = (TextView) v.findViewById(R.id.blog_post_date);
         }
 
-        @Override
-        public boolean areAllItemsEnabled() {
-            return true;
-        }
-
-        @Override
-        public boolean isEnabled(int i) {
-            return true;
-        }
-
-        @Override
-        public void registerDataSetObserver(DataSetObserver dataSetObserver) {
-
-        }
-
-        @Override
-        public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
-
-        }
-
-        @Override
-        public int getCount() {
-            return blogPosts.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return blogPosts.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return blogPosts.get(i).hashCode();
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup parent) {
-            if(view==null || !(view instanceof RelativeLayout) || !(view.getId()==R.id.list_item_blog_view))
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_blog, parent, false);
-
-            final Blog.Post post = blogPosts.get(i);
-
-
-            TextView titleView = (TextView) view.findViewById(R.id.blog_post_title);
-            TextView authorView = (TextView) view.findViewById(R.id.blog_post_author);
-            TextView dateView = (TextView) view.findViewById(R.id.blog_post_date);
-
-            titleView.setText(post.getSubject());
-            authorView.setText(post.getAuthor().getDisplayName());
-            dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getReleaseDate()));
-
-
-            view.setOnClickListener(new View.OnClickListener() {
+        public void initialize(final Blog.Post p)
+        {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    Activity activity = (Activity) view.getContext();
+                public void onClick(View v) {
+                    Activity activity = (Activity)itemView.getContext();
                     Intent intent = new Intent(activity, BlogPostActivity.class);
-                    intent.putExtra(BlogPostActivity.POST_EXTRA, post);
+                    intent.putExtra(BlogPostActivity.POST_EXTRA, p);
                     activity.startActivity(intent);
                     activity.overridePendingTransition(R.anim.slide_in_from_right, R.anim.stay_fixed);
                 }
             });
 
-            return view;
+            authorView.setText(p.getAuthor().getDisplayName());
+            dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(p.getReleaseDate()));
+            titleView.setText(p.getSubject());
+        }
+
+    }
+
+    public static class BlogPostAdapter extends RecyclerView.Adapter<BlogViewHolder> {
+        private List<Blog.Post> blogPosts;
+
+
+        public BlogPostAdapter(List<Blog.Post> blogPosts) {
+            this.blogPosts = blogPosts;
         }
 
         @Override
-        public int getItemViewType(int i) {
-            return 0;
+        public void onBindViewHolder(BlogViewHolder holder, int position) {
+            holder.initialize(blogPosts.get(position));
         }
 
         @Override
-        public int getViewTypeCount() {
-            return 1;
+        public BlogViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.
+                    from(parent.getContext()).
+                    inflate(R.layout.blog_list_items, parent, false);
+            return new BlogViewHolder(itemView);
         }
 
         @Override
-        public boolean isEmpty() {
-            return blogPosts.size()==0;
+        public int getItemCount() {
+            return blogPosts == null ? 0 : blogPosts.size();
         }
+
     }
 
 }

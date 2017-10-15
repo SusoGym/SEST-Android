@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +49,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
     private SwipeRefreshLayout swipeContainer;
 
     public SubstitutionplanFragment() {
-        super(R.layout.fragment_substitutionplan, R.id.nav_substitutionplan, R.string.nav_substitutionplan);
+        super(R.layout.substitutionplan_fragment, R.id.nav_substitutionplan, R.string.nav_substitutionplan);
 
     }
 
@@ -57,7 +58,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
         super.onCreate(savedInstanceState);
 
 
-        swipeContainer = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipeContainerSubstitutionplan);
+        swipeContainer = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipeRefreshContainer);
     }
 
     @Override
@@ -72,10 +73,9 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
     public void displaySubsitutionplan(JSONObject coverLessons) {
 
-        LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.content_substitutionplan);
+        LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.substitutionplan_content);
 
-        if(substitutionplanContent == null)
-        {
+        if (substitutionplanContent == null) {
             Log.i(TAG, "Error while trying to display Subsitutionplan: Layout is null; This is fine tho");
             return;
         }
@@ -134,7 +134,9 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
     public void displayNoSubstitution() {
 
-        LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.content_substitutionplan);
+        LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.substitutionplan_content);
+
+        substitutionplanContent.removeAllViews();
 
         TextView infoView = new TextView(substitutionplanContent.getContext());
         infoView.setText(R.string.no_substitutions);
@@ -188,12 +190,6 @@ public class SubstitutionplanFragment extends AbstractFragment {
     }
 
 
-
-
-
-
-
-
     private static class SubstitutionDataAdapter extends RecyclerView.Adapter {
         private List<SubstitutionData> substitutions;
 
@@ -204,7 +200,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_substitutionplan, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.substitutionplan_cardview, parent, false);
             return new SubstitutionDataViewHolder(view);
         }
 
@@ -300,38 +296,53 @@ public class SubstitutionplanFragment extends AbstractFragment {
     }
 
     private static class SubstitutionDataViewHolder extends RecyclerView.ViewHolder {
-        private TextView textView;
+        private TextView hourView;
+        private TextView teacherView;
+        private TextView subjectView;
+        private TextView roomView;
+        private TextView commentView;
 
-        private Context ctx;
+        private LinearLayout roomLayout;
+        private LinearLayout commentLayout;
 
         private SubstitutionDataViewHolder(View itemView) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.substitution_textview);
-            ctx = itemView.getContext();
+
+            hourView = (TextView) itemView.findViewById(R.id.substitution_card_hour);
+            teacherView = (TextView) itemView.findViewById(R.id.substitution_card_teacher);
+            subjectView = (TextView) itemView.findViewById(R.id.substitution_card_subject);
+            roomView = (TextView) itemView.findViewById(R.id.substitution_card_room);
+            commentView = (TextView) itemView.findViewById(R.id.substitution_card_comment);
+
+            roomLayout = (LinearLayout) itemView.findViewById(R.id.substitution_layout_room);
+            commentLayout = (LinearLayout) itemView.findViewById(R.id.substitution_layout_comment);
         }
 
-        void initialize(SubstitutionData data) {
+        private void initialize(SubstitutionData data) {
 
-            String hour = ctx.getString(R.string.substcard_hour) + " " + data.getHour() + "\n";
-            String teacher = ctx.getString(R.string.substcard_teacher) + " " + data.getTeacher() + data.getSubTeacher() + '\n';
-            String subject = ctx.getString(R.string.substcard_subject) + " " +data.getSubject() + data.getSubSubject() + '\n';
-            String room = (data.getSubRoom().isEmpty() ? "" : ctx.getString(R.string.substcard_room) + " " + data.getSubRoom() + '\n');
-            String comment = ctx.getString(R.string.substcard_comment) + " " + data.getComment();
 
-            textView.setText( hour + teacher + subject + room + comment, TextView.BufferType.SPANNABLE);
+            hourView.setText(data.getHour());
+            teacherView.setText(data.getTeacher() + " " + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
+            subjectView.setText(data.getSubject() + " " + data.getSubSubject(), TextView.BufferType.SPANNABLE);
+            if (data.getSubRoom().isEmpty()) {
+                roomLayout.setVisibility(View.INVISIBLE);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.BELOW, R.id.substitution_layout_subject);
+                commentLayout.setLayoutParams(params);
+            } else {
+                roomView.setText(data.getSubRoom());
+            }
+            commentView.setText(data.getComment());
 
-            Spannable spannable = (Spannable) textView.getText();
+            if (!data.getSubTeacher().isEmpty()) {
+                Spannable span = (Spannable) teacherView.getText();
+                span.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
 
-            int teacherIndex = hour.length() + ctx.getString(R.string.substcard_teacher).length() + 1;
-            int teacherEnd = teacherIndex + data.getTeacher().length();
-
-            int subjectIndex = hour.length() + teacher.length() + ctx.getString(R.string.substcard_subject).length() + 1;
-            int subjectEnd = subjectIndex + data.getSubject().length();
-
-            if (!data.getTeacher().isEmpty())
-                spannable.setSpan(new StrikethroughSpan(), teacherIndex, teacherEnd - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            if (!data.getSubject().isEmpty())
-                spannable.setSpan(new StrikethroughSpan(), subjectIndex, subjectEnd - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if (!data.getSubTeacher().isEmpty()) {
+                Spannable span = (Spannable) subjectView.getText();
+                span.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
         }
     }
 
@@ -372,8 +383,6 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
     private void displaySubstitutionplan(String json) {
 
-        LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.content_substitutionplan);
-
         try {
 
             JSONObject jsonObject = new JSONObject(json);
@@ -381,7 +390,6 @@ public class SubstitutionplanFragment extends AbstractFragment {
             displaySubsitutionplan(coverLessons);
 
         } catch (JSONException e) {
-            substitutionplanContent.removeAllViews();
             Log.e(TAG, "Error while trying to display substitutions: " + e.getMessage());
             displayNoSubstitution();
 
