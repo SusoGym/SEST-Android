@@ -44,7 +44,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    buildToolsVersion "25.0.2"
     defaultConfig {
         buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
         buildConfigField "int", "GIT_COMMITS", "${getAmountOfCommits()}"
@@ -97,9 +97,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:11.0.4'
     compile 'com.android.support.constraint:constraint-layout:+'
     testCompile 'junit:junit:4.12'
-
-    compile 'org.projectlombok:lombok:1.16.18'
-    annotationProcessor 'org.projectlombok:lombok:1.16.18'
+    provided 'org.projectlombok:lombok:1.16.18'
 }
 
 apply plugin: 'com.google.gms.google-services'
