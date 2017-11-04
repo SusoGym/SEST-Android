@@ -70,6 +70,127 @@ public class SubstitutionplanFragment extends AbstractFragment {
         updateSubstitutionplan();
     }
 
+
+
+
+
+
+    /**
+     * Converts the date format of the json retrieved from the server to an easily readable string
+     * @param date
+     * @return
+     * @throws ParseException
+     */
+    private String getDate(String date) throws ParseException {
+
+        DateFormat readFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat writeFormat = DateFormat.getDateInstance();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(readFormat.parse(date));
+
+
+        String dayOfWeek = "";
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.MONDAY:
+                dayOfWeek = getResources().getString(R.string.day_monday);
+                break;
+            case Calendar.TUESDAY:
+                dayOfWeek = getResources().getString(R.string.day_tuesday);
+                break;
+            case Calendar.WEDNESDAY:
+                dayOfWeek = getResources().getString(R.string.day_wednesday);
+                break;
+            case Calendar.THURSDAY:
+                dayOfWeek = getResources().getString(R.string.day_thursday);
+                break;
+            case Calendar.FRIDAY:
+                dayOfWeek = getResources().getString(R.string.day_friday);
+                break;
+            case Calendar.SATURDAY:
+                dayOfWeek = getResources().getString(R.string.day_saturday);
+                break;
+            case Calendar.SUNDAY:
+                dayOfWeek = getResources().getString(R.string.day_sunday);
+                break;
+        }
+        return dayOfWeek + ", " + writeFormat.format(calendar.getTime());
+    }
+
+
+
+
+
+
+
+    /**
+     * Displays and updates the substitutionplan
+     */
+    private void showSubstitutionplan() {
+
+        String savedSubstitutionplanData = SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, null);
+        if (savedSubstitutionplanData != null) {
+            displaySubstitutionplan(savedSubstitutionplanData);
+        }
+
+        updateSubstitutionplan();
+    }
+
+    /**
+     * Downloads the substitution plan from the server and displays it if it differs from the locally saved one
+     */
+    public void updateSubstitutionplan() {
+        SubstitutionplanFetcher.fetchAsync(AccountManager.getInstance().getUsername(), AccountManager.getInstance().getPassword(), getActivity(), new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
+            @Override
+            public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
+                boolean success = true;
+                if (request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK) {
+                    String json = request.getPayload();
+                    if (!SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, "").equals(json)) {
+                        SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).apply();
+                        displaySubstitutionplan(json);
+                    }
+                } else {
+                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getStatusCode() + "/" + request.getPayload());
+                    success = false;
+                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
+                }
+
+                FabricHandler.logCustomEvent(new CustomEvent("Reloaded Substitutionplan").putCustomAttribute("success", success + ""));
+
+                swipeContainer.setRefreshing(false);
+            }
+        });
+    }
+
+    /**
+     * Displays the substitution plan without updating anything
+     * @param json The substitution plan as a json string, may contain no substitution
+     */
+    private void displaySubstitutionplan(String json) {
+
+        try {
+
+            JSONObject jsonObject = new JSONObject(json);
+            JSONObject coverLessons = jsonObject.getJSONObject("coverlessons");
+            displaySubsitutionplan(coverLessons);
+
+        } catch (JSONException e) {
+            Log.e(TAG, "Error while trying to display substitutions: " + e.getMessage());
+            displayNoSubstitution();
+
+            if (!e.getMessage().contains("Value [] at coverlessons")) {
+                Toast.makeText(getActivity(), getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), getResources().getString(R.string.substplan_no_subst), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    /**
+     * Displays the substitution plan when there is at least one substitution
+     * @param coverLessons The substitution plan, must contain at least one substitution
+     */
     public void displaySubsitutionplan(JSONObject coverLessons) {
 
         LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.substitutionplan_content);
@@ -131,6 +252,10 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
     }
 
+
+    /**
+     * Displays the substitution plan when there is no substitution
+     */
     public void displayNoSubstitution() {
 
         LinearLayout substitutionplanContent = (LinearLayout) getActivity().findViewById(R.id.substitutionplan_content);
@@ -146,79 +271,12 @@ public class SubstitutionplanFragment extends AbstractFragment {
         infoView.setLayoutParams(llp);
         substitutionplanContent.addView(infoView);
 
-
-    }
-
-    private String getDate(String date) throws ParseException {
-
-                /*
-                Get date information such as an easily readable string represantation or the day of week
-                 */
-
-        DateFormat readFormat = new SimpleDateFormat("yyyyMMdd");
-        DateFormat writeFormat = DateFormat.getDateInstance();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(readFormat.parse(date));
-
-
-        String dayOfWeek = "";
-        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-            case Calendar.MONDAY:
-                dayOfWeek = getResources().getString(R.string.day_monday);
-                break;
-            case Calendar.TUESDAY:
-                dayOfWeek = getResources().getString(R.string.day_tuesday);
-                break;
-            case Calendar.WEDNESDAY:
-                dayOfWeek = getResources().getString(R.string.day_wednesday);
-                break;
-            case Calendar.THURSDAY:
-                dayOfWeek = getResources().getString(R.string.day_thursday);
-                break;
-            case Calendar.FRIDAY:
-                dayOfWeek = getResources().getString(R.string.day_friday);
-                break;
-            case Calendar.SATURDAY:
-                dayOfWeek = getResources().getString(R.string.day_saturday);
-                break;
-            case Calendar.SUNDAY:
-                dayOfWeek = getResources().getString(R.string.day_sunday);
-                break;
-        }
-        return dayOfWeek + ", " + writeFormat.format(calendar.getTime());
     }
 
 
-    private static class SubstitutionDataAdapter extends RecyclerView.Adapter {
-        private List<SubstitutionData> substitutions;
 
 
-        private SubstitutionDataAdapter(List<SubstitutionData> substitutions) {
-            this.substitutions = substitutions;
-        }
 
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.substitutionplan_cardview, parent, false);
-            return new SubstitutionDataViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            ((SubstitutionDataViewHolder) holder).initialize(substitutions.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return substitutions.size();
-        }
-
-        @Override
-        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-            super.onAttachedToRecyclerView(recyclerView);
-        }
-
-    }
 
     private static class SubstitutionData {
         private String subject;
@@ -291,8 +349,48 @@ public class SubstitutionplanFragment extends AbstractFragment {
             return hour;
         }
 
+    }
+
+
+
+
+
+    private static class SubstitutionDataAdapter extends RecyclerView.Adapter {
+        private List<SubstitutionData> substitutions;
+
+
+        private SubstitutionDataAdapter(List<SubstitutionData> substitutions) {
+            this.substitutions = substitutions;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.substitutionplan_cardview, parent, false);
+            return new SubstitutionDataViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            ((SubstitutionDataViewHolder) holder).initialize(substitutions.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return substitutions.size();
+        }
+
+        @Override
+        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
+        }
 
     }
+
+
+
+
+
+
 
     private static class SubstitutionDataViewHolder extends RecyclerView.ViewHolder {
         private TextView hourView;
@@ -321,7 +419,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
 
             hourView.setText(data.getHour());
-            teacherView.setText(data.getTeacher() + " " + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
+            //teacherView.setText(data.getTeacher() + " " + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
             subjectView.setText(data.getSubject() + " " + data.getSubSubject(), TextView.BufferType.SPANNABLE);
             if (data.getSubRoom().isEmpty()) {
                 roomLayout.setVisibility(View.INVISIBLE);
@@ -334,8 +432,13 @@ public class SubstitutionplanFragment extends AbstractFragment {
             commentView.setText(data.getComment());
 
             if (!data.getSubTeacher().isEmpty()) {
-                Spannable span = (Spannable) teacherView.getText();
-                span.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if(displayTeacherName(data)) {
+                    teacherView.setText(data.getTeacher() + " " + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
+                    Spannable span = (Spannable) teacherView.getText();
+                    span.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }else{
+                    teacherView.setText(data.getSubTeacher(), TextView.BufferType.SPANNABLE);
+                }
             }
 
             if (!data.getSubTeacher().isEmpty()) {
@@ -343,64 +446,15 @@ public class SubstitutionplanFragment extends AbstractFragment {
                 span.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-    }
 
-
-    private void showSubstitutionplan() {
-
-        String savedSubstitutionplanData = SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, null);
-        if (savedSubstitutionplanData != null) {
-            displaySubstitutionplan(savedSubstitutionplanData);
+        private boolean displayTeacherName(SubstitutionData data){
+            if(data.getClasses().equalsIgnoreCase("k1") || data.getClasses().equalsIgnoreCase("k2")
+                    || data.getSubject().equalsIgnoreCase("ev") || data.getSubject().equalsIgnoreCase("rk")
+                    || data.getSubject().equalsIgnoreCase("sp") || data.getSubject().equalsIgnoreCase("nwt")
+                    || data.getSubject().equalsIgnoreCase("f") || data.getSubject().equalsIgnoreCase("or"))
+                return true;
+            return false;
         }
-
-        updateSubstitutionplan();
-    }
-
-    public void updateSubstitutionplan() {
-        SubstitutionplanFetcher.fetchAsync(AccountManager.getInstance().getUsername(), AccountManager.getInstance().getPassword(), getActivity(), new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
-            @Override
-            public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
-                boolean success = true;
-                if (request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK) {
-                    String json = request.getPayload();
-                    if (!SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, "").equals(json)) {
-                        SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).apply();
-                        displaySubstitutionplan(json);
-                    }
-                } else {
-                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getStatusCode() + "/" + request.getPayload());
-                    success = false;
-                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
-                }
-
-                FabricHandler.logCustomEvent(new CustomEvent("Reloaded Substitutionplan").putCustomAttribute("success", success + ""));
-
-                swipeContainer.setRefreshing(false);
-            }
-        });
-    }
-
-    private void displaySubstitutionplan(String json) {
-
-        try {
-
-            JSONObject jsonObject = new JSONObject(json);
-            JSONObject coverLessons = jsonObject.getJSONObject("coverlessons");
-            displaySubsitutionplan(coverLessons);
-
-        } catch (JSONException e) {
-            Log.e(TAG, "Error while trying to display substitutions: " + e.getMessage());
-            displayNoSubstitution();
-
-            if (!e.getMessage().contains("Value [] at coverlessons")) {
-                Toast.makeText(getActivity(), getResources().getString(R.string.substplan_json_error), Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getActivity(), getResources().getString(R.string.substplan_no_subst), Toast.LENGTH_LONG).show();
-            }
-
-        }
-
-
     }
 
 }
