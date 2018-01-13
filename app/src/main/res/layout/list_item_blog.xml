@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/list_item_blog_view"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
+
+
+
+    <TextView
+        android:id="@+id/blog_post_title"
+
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="25sp"
+        android:paddingLeft="10dp"/>
+
+
+    <TextView
+        android:id="@+id/blog_post_author"
+
+        android:layout_below="@+id/blog_post_title"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textSize="15sp"
+        android:paddingLeft="10dp"/>
+
+    <TextView
+        android:id="@+id/blog_post_date"
+
+
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@id/blog_post_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textSize="15sp"
+        android:paddingRight="20dp"/>
+
+
+
+
+</RelativeLayout>

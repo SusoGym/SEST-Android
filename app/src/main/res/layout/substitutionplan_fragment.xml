@@ -1,0 +1,21 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/substitution_scrollview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollX="20dp"
+    android:scrollY="20dp"
+    tools:context="de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment">
+
+    <LinearLayout
+        android:id="@+id/substitutionplan_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="vertical"
+        android:padding="0dp"
+        tools:listitem="@layout/substitutionplan_cardview">
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

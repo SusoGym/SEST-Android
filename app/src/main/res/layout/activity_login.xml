@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.konstanz.schulen.suso.activities.LoginActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:orientation="vertical"
+        android:layout_marginTop="70dp">
+        <ImageView
+            android:id="@+id/login_img"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_gravity="center"
+            android:contentDescription="Suso"
+            android:src="@mipmap/nav_bar_header"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="25dp"
+            android:paddingBottom="20dp"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textColor="@color/colorContrast2"
+            android:text="@string/login_header"/>
+
+        <EditText
+            android:id="@+id/edittext_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:layout_marginBottom="14dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginLeft="35dp"
+            android:paddingBottom="5dp"
+            android:hint="@string/login_username"
+            android:background="@drawable/edittext_bottom_line"
+            android:textAlignment="center"
+            android:textColorHint="@color/colorContrast"
+            android:textSize="25sp"
+            android:maxLines="1"
+            android:textColor="@color/colorContrast"/>
+
+        <EditText
+            android:id="@+id/edittext_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:layout_marginBottom="14dp"
+            android:textSize="25sp"
+            android:layout_marginRight="35dp"
+            android:layout_marginLeft="35dp"
+            android:paddingBottom="5dp"
+            android:hint="@string/login_password"
+            android:background="@drawable/edittext_bottom_line"
+            android:textColorHint="@color/colorContrast"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:textColor="@color/colorContrast"/>
+
+        <Button
+            android:id="@+id/button_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:textSize="24sp"
+            android:text="@string/login_loginbtn"
+            android:background="@color/colorPrimaryDark"/>
+
+
+
+    </LinearLayout>
+
+
+
+
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Einstellungen</string>
+    <string name="day_friday">Freitag</string>
+    <string name="day_monday">Montag</string>
+    <string name="day_saturday">Samstag</string>
+    <string name="day_sunday">Sonntag</string>
+    <string name="day_thursday">Donnerstag</string>
+    <string name="day_tuesday">Dienstag</string>
+    <string name="day_wednesday">Mittwoch</string>
+    <string name="login_invalid_data">Benutzername oder Passwort ungültig</string>
+    <string name="login_network_error">Fehler bei der Anmeldung. Bitte überprüfe deine Internetverbindung</string>
+    <string name="navigation_drawer_close">Schließen</string>
+    <string name="no_substitutions">Keine Vertretungen</string>
+    <string name="substcard_comment">Kommentar:</string>
+    <string name="substcard_hour">Stunde:</string>
+    <string name="substcard_room">Raum:</string>
+    <string name="substcard_subject">Fach:</string>
+    <string name="substcard_teacher">Lehrer:</string>
+    <string name="substplan_json_error">Fehler beim Auslesen des Vertretungsplans (JSON). Daten sind möglicherweise unvollständig oder fehlerhaft</string>
+    <string name="substplan_network_error">Vertretungsplan konnte nicht heruntergeladen werden. Der letzte verfügbare Stand wird angezeigt</string>
+    <string name="nav_substitutionplan">Vertretungsplan</string>
+    <string name="login_header">Bitte mit den Novell Daten anmelden</string>
+    <string name="nav_logout">Abmelden</string>
+    <string name="login_loginbtn">Anmelden</string>
+    <string name="login_password">Passwort</string>
+    <string name="login_username">Nutzername</string>
+    <string name="navigation_drawer_open">Öffnen</string>
+    <string name="login_error">Beim Anmelden ist ein Fehler aufgetreten.</string>
+    <string name="nav_blog">Blog</string>
+    <string name="substplan_no_subst">Momentan existieren keine Vertretungen</string>
+    <string name="no_blog_posts">Keine Blog Posts</string>
+</resources>
