@@ -12,12 +12,12 @@
     <string name="login_network_error">Error while trying to log in. Please check your internet connection.</string>
     <string name="no_substitutions">No Substitutions</string>
     <string name="substcard_comment">Comment:</string>
-    <string name="substcard_hour">Hour:</string>
+    <string name="substcard_hour">Lesson:</string>
     <string name="substcard_room">Room:</string>
     <string name="substcard_subject">Subject:</string>
     <string name="substcard_teacher">Teacher:</string>
     <string name="substplan_json_error">Error while trying to read substitution data. Data may be incorrect</string>
-    <string name="substplan_network_error">Unable able to download Substitutionplan. Please check your internet connection</string>
+    <string name="substplan_network_error">Unable able to download Substitutionplan. Showing latest available data</string>
     <string name="nav_substitutionplan">Substitutionplan</string>
     <string name="nav_logout">Logout</string>
     <string name="login_header">Please login with your Novell credentials</string>

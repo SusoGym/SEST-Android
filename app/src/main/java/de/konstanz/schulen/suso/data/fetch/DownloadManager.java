@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.credentials.Credential;
 
@@ -39,7 +40,7 @@ public class DownloadManager {
     private String username = null, password = null;
     @Getter
     private AccountInformation accountInformation = null;
-    @Getter
+    //@Getter
     private String substitutionplanData = null;
 
     public DownloadManager(Context context){
@@ -77,6 +78,7 @@ public class DownloadManager {
             this.username = username;
             this.password = password;
             saveToSharedPreferences();
+            SharedPreferencesManager.getSharedPreferences().edit().putString(SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA, response.getData()).commit();
 
 
             this.substitutionplanData = response.getData();
@@ -92,6 +94,8 @@ public class DownloadManager {
                     className = userData.getString("class");
                 }
                 this.accountInformation = new AccountInformation(accountType, accountId, name, surname, className);
+
+
             }catch(JSONException e){
                 DebugUtil.errorLog(TAG, e.getMessage());
             }
@@ -114,6 +118,7 @@ public class DownloadManager {
         Log.i(TAG, "Logging out...");
         username = null;
         password = null;
+
         saveToSharedPreferences();
         FirebaseHandler.getInstance().deleteToken();
     }
@@ -121,8 +126,20 @@ public class DownloadManager {
 
 
     public void updateSubstitutionplanData(final Context context, final Callback<SubstitutionplanFetcher.SubstitutionplanResponse> callback){
-        final String username = this.username;
-        final String password = this.password;
+
+        String usernameTemp, passwordTemp;
+        if(this.username==null || this.password==null){
+            usernameTemp = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_USERNAME, null);
+            passwordTemp = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_PASSWORD, null);
+        }else{
+            usernameTemp = this.username;
+            passwordTemp = this.password;
+        }
+
+
+
+        final String username = usernameTemp;
+        final String password = passwordTemp;
         (new Thread(){
             @Override
             public void run(){
@@ -130,12 +147,16 @@ public class DownloadManager {
                 ThreadHandler.runOnMainThread(new Runnable() {
                     @Override
                     public void run() {
+                        if(response.getErrorCode()== SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR){
+                            SharedPreferencesManager.getSharedPreferences().edit().putString(SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA, response.getData()).commit();
+                        }
                         callback.callback(response);
                     }
                 }, context);
             }
         }).start();
     }
+
 
 
 

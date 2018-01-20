@@ -26,12 +26,6 @@ public class SubstitutionplanFetcher {
 
     public static SubstitutionplanResponse fetch(Context context, @NonNull String username, @NonNull String password){
         try {
-            DebugUtil.errorLog(TAG, "USERNAME: " + (username==null));
-            DebugUtil.errorLog(TAG, "PASSWORD: " + (password==null));
-            StackTraceElement[] st = Thread.currentThread().getStackTrace();
-            for(StackTraceElement  s : st){
-                DebugUtil.errorLog(TAG, s.getClassName() + " " + s.getLineNumber());
-            }
             username = URLEncoder.encode(username, "UTF-8");
             password = URLEncoder.encode(password, "UTF-8");
 

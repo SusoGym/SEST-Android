@@ -15,7 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.data.fetch.DownloadManager;
 import de.konstanz.schulen.suso.data.fetch.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.util.Callback;
+import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
@@ -62,6 +64,8 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
     @Override
     public void onPushToForeground() {
+
+        DebugUtil.errorLog(TAG, "Pushing to foreground");
         showSubstitutionplan();
     }
 
@@ -129,9 +133,10 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
         String savedSubstitutionplanData = SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, null);
         if (savedSubstitutionplanData != null) {
+            DebugUtil.errorLog(TAG, savedSubstitutionplanData);
             displaySubstitutionplan(savedSubstitutionplanData);
         }
-
+        DebugUtil.errorLog(TAG, "Updating substitution plan");
         updateSubstitutionplan();
     }
 
@@ -139,6 +144,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
      * Downloads the substitution plan from the server and displays it if it differs from the locally saved one
      */
     public void updateSubstitutionplan() {
+
         DownloadManager.getInstance().updateSubstitutionplanData(getActivity(), new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
             @Override
             public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
@@ -146,11 +152,12 @@ public class SubstitutionplanFragment extends AbstractFragment {
                 if (request.getErrorCode() == SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR) {
                     String json = request.getData();
                     if (!SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, "").equals(json)) {
-                        SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).apply();
+                        //SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).commit();
                         displaySubstitutionplan(json);
                     }
-                } else {
-                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getErrorCode() + "/" + request.getData());
+
+                }else{
+                    DebugUtil.errorLog(TAG, "Error while trying to reload subsitutions: " + request.getErrorCode() + "/" + request.getData());
                     success = false;
                     Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
                 }
@@ -290,14 +297,14 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
 
         public SubstitutionData(JSONObject jsonData) throws JSONException {
-            subject = jsonData.getString("subject");
-            teacher = jsonData.getString("teacher");
-            subTeacher = jsonData.getString("subteacher");
-            subSubject = jsonData.getString("subsubject");
-            subRoom = jsonData.getString("subroom");
-            classes = jsonData.getString("classes");
-            comment = jsonData.getString("comment");
-            hour = jsonData.getString("hour");
+            subject = jsonData.getString("subject").trim();
+            teacher = jsonData.getString("teacher").trim();
+            subTeacher = jsonData.getString("subteacher").trim();
+            subSubject = jsonData.getString("subsubject").trim();
+            subRoom = jsonData.getString("subroom").trim();
+            classes = jsonData.getString("classes").trim();
+            comment = jsonData.getString("comment").trim();
+            hour = jsonData.getString("hour").trim();
 
         /*
         If subject or teacher stay the same, show now crossed-out text, else add a space between
@@ -399,8 +406,10 @@ public class SubstitutionplanFragment extends AbstractFragment {
         private TextView roomView;
         private TextView commentView;
 
-        private LinearLayout roomLayout;
-        private LinearLayout commentLayout;
+        //private LinearLayout roomLayout;
+        //private LinearLayout commentLayout;
+        private TableLayout table;
+
 
         private SubstitutionDataViewHolder(View itemView) {
             super(itemView);
@@ -411,16 +420,42 @@ public class SubstitutionplanFragment extends AbstractFragment {
             roomView = (TextView) itemView.findViewById(R.id.substitution_card_room);
             commentView = (TextView) itemView.findViewById(R.id.substitution_card_comment);
 
-            roomLayout = (LinearLayout) itemView.findViewById(R.id.substitution_layout_room);
-            commentLayout = (LinearLayout) itemView.findViewById(R.id.substitution_layout_comment);
+            //roomLayout = (LinearLayout) itemView.findViewById(R.id.substitution_layout_room);
+            //commentLayout = (LinearLayout) itemView.findViewById(R.id.substitution_layout_comment);
+            table = (TableLayout) itemView.findViewById(R.id.substitution_card_table);
+
+
         }
 
         private void initialize(SubstitutionData data) {
-
-
             hourView.setText(data.getHour());
+
+            if(displayTeacherName(data)){
+                teacherView.setText(data.getTeacher() + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
+                if(data.getTeacher()!=""){
+                    Spannable spannable = (Spannable) teacherView.getText();
+                    spannable.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+            else table.removeView(table.findViewById(R.id.substitution_card_teacher_row));
+
+            subjectView.setText(data.getSubject() + data.getSubSubject(), TextView.BufferType.SPANNABLE);
+            if(data.getSubject()!=""){
+                Spannable spannable = (Spannable) subjectView.getText();
+                spannable.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+            if(data.getSubRoom()!="") roomView.setText(data.getSubRoom());
+            else table.removeView(table.findViewById(R.id.substitution_card_room_row));
+
+            commentView.setText(data.getComment());
+
+
+
+
+            /*hourView.setText(data.getHour());
             //teacherView.setText(data.getTeacher() + " " + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
-            subjectView.setText(data.getSubject() + " " + data.getSubSubject(), TextView.BufferType.SPANNABLE);
+            subjectView.setText(data.getSubject() + data.getSubSubject(), TextView.BufferType.SPANNABLE);
             if (data.getSubRoom().isEmpty()) {
                 roomLayout.setVisibility(View.INVISIBLE);
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -433,7 +468,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
             if (!data.getSubTeacher().isEmpty()) {
                 if(displayTeacherName(data)) {
-                    teacherView.setText(data.getTeacher() + " " + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
+                    teacherView.setText(data.getTeacher() + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
                     Spannable span = (Spannable) teacherView.getText();
                     span.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }else{
@@ -444,7 +479,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
             if (!data.getSubTeacher().isEmpty()) {
                 Spannable span = (Spannable) subjectView.getText();
                 span.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
+            }*/
         }
 
         private boolean displayTeacherName(SubstitutionData data){
