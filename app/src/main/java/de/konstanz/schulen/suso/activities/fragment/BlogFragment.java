@@ -26,7 +26,7 @@ import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.activities.BlogPostActivity;
 import de.konstanz.schulen.suso.data.Blog;
 import de.konstanz.schulen.suso.data.BlogFetcher;
-import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.data.fetch.DownloadManager;
 import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.FabricHandler;
 
@@ -57,7 +57,7 @@ public class BlogFragment extends AbstractFragment {
     @Override
     public void refresh() {
 
-        BlogFetcher.getFetcher().setCredentials(AccountManager.getInstance().getCredentials()).setAction(BlogFetcher.Fetcher.Action.FETCH_POSTS).
+        BlogFetcher.getFetcher().setCredentials(DownloadManager.getInstance().getCredentials()).setAction(BlogFetcher.Fetcher.Action.FETCH_POSTS).
                 performAsync(new Callback<BlogFetcher.Response>() {
                     @Override
                     public void callback(BlogFetcher.Response response) {

@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
-import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.data.fetch.DownloadManager;
 import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.IOUtility;
 
@@ -80,7 +80,7 @@ public class FirebaseHandler {
                 public void run() {
                     try {
                         boolean registered = isRegistered(token);
-                        boolean validLogin = AccountManager.getInstance().isValidLogin(ctx);
+                        boolean validLogin = DownloadManager.getInstance().isLoggedIn();
                         DebugUtil.infoLog(TAG, "Token registered: " + registered + "; Valid login: " + validLogin);
                         if (!registered && validLogin) {
                             registerToken();
@@ -104,9 +104,9 @@ public class FirebaseHandler {
             public void run() {
 
                 try {
-
-                    int userId = AccountManager.getInstance().getAccountId();
-                    int userType = AccountManager.getInstance().getAccountType();
+                    DownloadManager.AccountInformation accountInformation = DownloadManager.getInstance().getAccountInformation();
+                    int userId = accountInformation.getAccountId();
+                    int userType = accountInformation.getAccountType();
 
                     boolean success = false;
 

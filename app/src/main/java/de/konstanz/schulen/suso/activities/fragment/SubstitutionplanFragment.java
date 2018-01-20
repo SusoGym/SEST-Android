@@ -34,8 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.konstanz.schulen.suso.R;
-import de.konstanz.schulen.suso.data.SubstitutionplanFetcher;
-import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.data.fetch.DownloadManager;
+import de.konstanz.schulen.suso.data.fetch.SubstitutionplanFetcher;
 import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
@@ -139,18 +139,18 @@ public class SubstitutionplanFragment extends AbstractFragment {
      * Downloads the substitution plan from the server and displays it if it differs from the locally saved one
      */
     public void updateSubstitutionplan() {
-        SubstitutionplanFetcher.fetchAsync(AccountManager.getInstance().getUsername(), AccountManager.getInstance().getPassword(), getActivity(), new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
+        DownloadManager.getInstance().updateSubstitutionplanData(getActivity(), new Callback<SubstitutionplanFetcher.SubstitutionplanResponse>() {
             @Override
             public void callback(SubstitutionplanFetcher.SubstitutionplanResponse request) {
                 boolean success = true;
-                if (request.getStatusCode() == SubstitutionplanFetcher.SubstitutionplanResponse.STATUS_OK) {
-                    String json = request.getPayload();
+                if (request.getErrorCode() == SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR) {
+                    String json = request.getData();
                     if (!SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, "").equals(json)) {
                         SharedPreferencesManager.getSharedPreferences().edit().putString(SHR_SUBSITUTIONPLAN_DATA, json).apply();
                         displaySubstitutionplan(json);
                     }
                 } else {
-                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getStatusCode() + "/" + request.getPayload());
+                    Log.e(TAG, "Error while trying to reload subsitutions: " + request.getErrorCode() + "/" + request.getData());
                     success = false;
                     Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.substplan_network_error), Toast.LENGTH_SHORT).show();
                 }

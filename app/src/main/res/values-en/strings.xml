@@ -9,7 +9,7 @@
     <string name="day_tuesday">Tuesday</string>
     <string name="day_wednesday">Wednesday</string>
     <string name="login_invalid_data">Invalid username or password</string>
-    <string name="login_network_error">Error while trying to log in. Please check your internetconnection.</string>
+    <string name="login_network_error">Error while trying to log in. Please check your internet connection.</string>
     <string name="no_substitutions">No Substitutions</string>
     <string name="substcard_comment">Comment:</string>
     <string name="substcard_hour">Hour:</string>

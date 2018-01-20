@@ -24,9 +24,8 @@ import de.konstanz.schulen.suso.R;
 import de.konstanz.schulen.suso.activities.fragment.AbstractFragment;
 import de.konstanz.schulen.suso.activities.fragment.BlogFragment;
 import de.konstanz.schulen.suso.activities.fragment.SubstitutionplanFragment;
-import de.konstanz.schulen.suso.util.AccountManager;
+import de.konstanz.schulen.suso.data.fetch.DownloadManager;
 import de.konstanz.schulen.suso.util.DebugUtil;
-import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
 
 public class MainActivity extends AppCompatActivity
@@ -44,7 +43,7 @@ public class MainActivity extends AppCompatActivity
 
     private HashMap<Class<? extends AbstractFragment>, AbstractFragment> fragments = new HashMap<>();
 
-    private SharedPreferences sharedPreferences = SharedPreferencesManager.getSharedPreferences();
+    //private SharedPreferences sharedPreferences = SharedPreferencesManager.getSharedPreferences();
 
     private DrawerLayout navigationDrawer;
     private NavigationView navigationView;
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity
         } else if (clazz != null) { // selected new fragment
             setActiveFragment(clazz);
         } else if (id == R.id.nav_logout) { // selected logged out TODO: add smoother way of handling this
-            AccountManager.getInstance().logout();
+            DownloadManager.getInstance().logout();
 
             Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
             startActivity(intent);

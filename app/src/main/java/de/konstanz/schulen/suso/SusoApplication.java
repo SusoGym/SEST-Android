@@ -7,7 +7,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
-import de.konstanz.schulen.suso.util.AccountManager;
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
@@ -15,6 +14,7 @@ public class SusoApplication extends Application {
 
     public static final String TAG = SusoApplication.class.getSimpleName();
     public static String API_ENDPOINT = null;
+
 
 
     @Override
@@ -50,7 +50,8 @@ public class SusoApplication extends Application {
 
         Log.i(TAG, text.toString());
 
-        AccountManager.getInstance().loadFromSharedPreferences(this);
+        //AccountManager.getInstance().loadFromSharedPreferences(this);
+        de.konstanz.schulen.suso.data.fetch.DownloadManager.initializeInstance(this);
 
         FirebaseHandler.getInstance().setEndPoint(API_ENDPOINT);
         FirebaseHandler.getInstance().startup(this);
