@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.credentials.Credential;
 
@@ -40,8 +39,7 @@ public class DownloadManager {
     private String username = null, password = null;
     @Getter
     private AccountInformation accountInformation = null;
-    //@Getter
-    private String substitutionplanData = null;
+
 
     public DownloadManager(Context context){
         String username = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_USERNAME, null);
@@ -81,7 +79,6 @@ public class DownloadManager {
             SharedPreferencesManager.getSharedPreferences().edit().putString(SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA, response.getData()).commit();
 
 
-            this.substitutionplanData = response.getData();
 
             try {
                 JSONObject userData = new JSONObject(response.getData()).getJSONObject("user").getJSONObject("data");

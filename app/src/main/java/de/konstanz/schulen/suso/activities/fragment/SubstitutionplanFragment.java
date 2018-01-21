@@ -1,6 +1,7 @@
 package de.konstanz.schulen.suso.activities.fragment;
 
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -41,6 +43,7 @@ import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
+import lombok.Getter;
 
 import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA;
 
@@ -286,14 +289,10 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
 
     private static class SubstitutionData {
-        private String subject;
-        private String teacher;
-        private String subTeacher;
-        private String subSubject;
-        private String subRoom;
-        private String classes;
-        private String comment;
-        private String hour;
+        @Getter
+        private String subject, teacher, subTeacher, subSubject, subRoom, classes, comment, hour;
+        @Getter
+        private boolean highlightSubject, highlightTeacher;
 
 
         public SubstitutionData(JSONObject jsonData) throws JSONException {
@@ -306,55 +305,34 @@ public class SubstitutionplanFragment extends AbstractFragment {
             comment = jsonData.getString("comment").trim();
             hour = jsonData.getString("hour").trim();
 
-        /*
-        If subject or teacher stay the same, show now crossed-out text, else add a space between
-        the crossed-out and the new text
-         */
-            if (subSubject.equalsIgnoreCase(subject)) subject = "";
-            else subject = subject + ' ';
-            if (subTeacher.equalsIgnoreCase(teacher)) teacher = "";
-            else teacher = teacher + ' ';
 
-        /*
+
+
+            /*
         Display no text instead of 3 bars for a clear field
          */
             if (subTeacher.equals("---")) subTeacher = "";
             if (subSubject.equals("---")) subSubject = "";
             if (subRoom.equals("---")) subRoom = "";
 
+
+
+        /*
+        If subject or teacher stay the same, show now crossed-out text, else add a space between
+        the crossed-out and the new text
+         */
+            if (subSubject.equalsIgnoreCase(subject)) subject = "";
+            else highlightSubject = true;
+            //else subject = subject + ' ';
+            if (subTeacher.equalsIgnoreCase(teacher)) teacher = "";
+            else highlightTeacher = true;
+            //else teacher = teacher + ' ';
+
+
+
         }
 
-        public String getSubject() {
-            return subject;
-        }
 
-        public String getTeacher() {
-            return teacher;
-        }
-
-        public String getSubTeacher() {
-            return subTeacher;
-        }
-
-        public String getSubSubject() {
-            return subSubject;
-        }
-
-        public String getSubRoom() {
-            return subRoom;
-        }
-
-        public String getClasses() {
-            return classes;
-        }
-
-        public String getComment() {
-            return comment;
-        }
-
-        public String getHour() {
-            return hour;
-        }
 
     }
 
@@ -430,20 +408,50 @@ public class SubstitutionplanFragment extends AbstractFragment {
         private void initialize(SubstitutionData data) {
             hourView.setText(data.getHour());
 
+
+
             if(displayTeacherName(data)){
-                teacherView.setText(data.getTeacher() + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
-                if(data.getTeacher()!=""){
+                if(!data.getTeacher().isEmpty()){
+                    teacherView.setText(data.getTeacher() + ' ' + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
                     Spannable spannable = (Spannable) teacherView.getText();
                     spannable.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }else{
+                    teacherView.setText(data.getSubTeacher());
                 }
+            }else if(!data.subTeacher.isEmpty()){
+                teacherView.setText(data.subTeacher);
             }
             else table.removeView(table.findViewById(R.id.substitution_card_teacher_row));
 
-            subjectView.setText(data.getSubject() + data.getSubSubject(), TextView.BufferType.SPANNABLE);
-            if(data.getSubject()!=""){
+            if(data.isHighlightTeacher()){
+                Spannable spannable = (Spannable) teacherView.getText();
+                if(data.getTeacher().isEmpty()) spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                else spannable.setSpan(new StyleSpan(Typeface.BOLD), data.getTeacher().length()+1, data.getTeacher().length()+1 + data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+
+
+
+            if(!data.getSubject().isEmpty()){
+                subjectView.setText(data.getSubject() + ' ' + data.getSubSubject(), TextView.BufferType.SPANNABLE);
                 Spannable spannable = (Spannable) subjectView.getText();
                 spannable.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if(data.isHighlightSubject()){
+                    spannable.setSpan(new StyleSpan(Typeface.BOLD), data.getSubject().length()+1, data.getSubject().length()+1+data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
             }
+            else{
+                subjectView.setText(data.getSubSubject());
+                if(data.isHighlightSubject()){
+                    Spannable spannable = (Spannable) subjectView.getText();
+                    spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+
+
+
+
+
 
             if(data.getSubRoom()!="") roomView.setText(data.getSubRoom());
             else table.removeView(table.findViewById(R.id.substitution_card_room_row));
@@ -483,7 +491,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
         }
 
         private boolean displayTeacherName(SubstitutionData data){
-            if(data.getClasses().equalsIgnoreCase("k1") || data.getClasses().equalsIgnoreCase("k2")
+            if(data.getClasses().equalsIgnoreCase("11") || data.getClasses().equalsIgnoreCase("12")
                     || data.getSubject().equalsIgnoreCase("ev") || data.getSubject().equalsIgnoreCase("rk")
                     || data.getSubject().equalsIgnoreCase("sp") || data.getSubject().equalsIgnoreCase("nwt")
                     || data.getSubject().equalsIgnoreCase("f") || data.getSubject().equalsIgnoreCase("or"))

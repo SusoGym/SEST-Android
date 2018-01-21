@@ -2,7 +2,6 @@ package de.konstanz.schulen.suso.data.fetch;
 
 
 import android.content.Context;
-import android.os.Debug;
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;

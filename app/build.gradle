@@ -69,8 +69,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "Boolean", "DEBUG_MODE", "false"
             signingConfig signingConfigs.config
+            proguardFile 'E:/Daniel/Projekte/java/Suso/app/proguard-rules.pro'
         }
-
         debug {
             buildConfigField "Boolean", "DEBUG_MODE", "true"
             signingConfig signingConfigs.config

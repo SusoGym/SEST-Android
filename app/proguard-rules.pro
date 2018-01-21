@@ -15,3 +15,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-ignorewarnings
+-keep public class DownloadManager
+-keep public class SmartLockHandler
+-keep public class SubstitutionplanFetcher
+-keep public class Callback
