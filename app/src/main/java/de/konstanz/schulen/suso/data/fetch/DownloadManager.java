@@ -62,8 +62,15 @@ public class DownloadManager {
         (new Thread(){
             @Override
             public void run(){
-                int errorCode = loginSync(context, username, password);
-                if(callback!=null) callback.callback(errorCode);
+                final int errorCode = loginSync(context, username, password);
+                if(callback!=null){
+                    ThreadHandler.runOnMainThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.callback(errorCode);
+                        }
+                    }, context);
+                }
             }
         }).start();
     }
