@@ -3,6 +3,8 @@
           package="de.konstanz.schulen.suso">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".SusoApplication"
@@ -51,10 +53,7 @@
         <meta-data
             android:name="asset_statements"
             android:resource="@string/asset_statements"/>
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="da6a32ead207d72a41975278a99e85912ecc59aa"/>
-
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="true" />
         <activity android:name=".activities.BlogPostActivity">
         </activity>
     </application>

@@ -6,7 +6,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
@@ -19,6 +18,7 @@ public class SusoApplication extends Application {
 
     @Override
     public void onCreate() {
+        super.onCreate();
 
         Log.i(TAG, "Starting Suso App...");
 
@@ -34,7 +34,6 @@ public class SusoApplication extends Application {
             Log.i(TAG, "Welcome Testing!");
         }
 
-        FabricHandler.initialize(this);
 
         CharSequence text = "Version: " + BuildConfig.VERSION_NAME + "/" + BuildConfig.GIT_HASH + "(" + BuildConfig.GIT_COMMITS + ")";
 
@@ -50,13 +49,7 @@ public class SusoApplication extends Application {
 
         Log.i(TAG, text.toString());
 
-        //AccountManager.getInstance().loadFromSharedPreferences(this);
-        de.konstanz.schulen.suso.data.fetch.DownloadManager.initializeInstance(this);
-
-        FirebaseHandler.getInstance().setEndPoint(API_ENDPOINT);
-        FirebaseHandler.getInstance().startup(this);
 
         Log.i(TAG, "Successfully started Suso App");
-        super.onCreate();
     }
 }
