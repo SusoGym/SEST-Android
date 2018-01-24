@@ -87,8 +87,6 @@ public class MainActivity extends AppCompatActivity
         AbstractFragment.setMasterActivity(this);
 
 
-
-
     }
 
     @Override
@@ -112,8 +110,9 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < menu.size(); i++) {
             MenuItem mI = menu.getItem(i);
 
-            if (!AbstractFragment.isValid(mI.getItemId()))
+            if (!AbstractFragment.isValid(mI.getItemId())) {
                 mI.setEnabled(false);
+            }
         }
     }
 
@@ -155,8 +154,6 @@ public class MainActivity extends AppCompatActivity
         frgmt.onPushToForeground();
 
     }
-
-
 
 
     @Override
