@@ -52,7 +52,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode getAmountOfCommits().toInteger()
-        versionName "0.2"
+        versionName "0.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -97,7 +97,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:11.8.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
-    compile 'org.projectlombok:lombok:1.16.18'
+    compileOnly 'org.projectlombok:lombok:1.16.18'
     annotationProcessor 'org.projectlombok:lombok:1.16.18'
 }
 
