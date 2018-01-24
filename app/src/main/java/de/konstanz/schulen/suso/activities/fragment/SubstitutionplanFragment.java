@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
@@ -408,45 +409,59 @@ public class SubstitutionplanFragment extends AbstractFragment {
         private void initialize(SubstitutionData data) {
             hourView.setText(data.getHour());
 
-
+            Spannable teacherViewSpannable = null;
 
             if(displayTeacherName(data)){
                 if(!data.getTeacher().isEmpty()){
-                    teacherView.setText(data.getTeacher() + ' ' + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
-                    Spannable spannable = (Spannable) teacherView.getText();
-                    spannable.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    teacherViewSpannable = new SpannableString(data.getTeacher() + ' ' + data.getSubTeacher());
+                    teacherViewSpannable.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    //teacherView.setText(data.getTeacher() + ' ' + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
+                    //Spannable spannable = (Spannable) teacherView.getText();
+                    //spannable.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }else{
-                    teacherView.setText(data.getSubTeacher());
+                    teacherViewSpannable = new SpannableString(data.getSubTeacher());
+                    //teacherView.setText(data.getSubTeacher());
                 }
             }else if(!data.subTeacher.isEmpty()){
-                teacherView.setText(data.subTeacher);
+                teacherViewSpannable = new SpannableString(data.getSubTeacher());
+                //teacherView.setText(data.subTeacher);
             }
             else table.removeView(table.findViewById(R.id.substitution_card_teacher_row));
 
-            if(data.isHighlightTeacher()){
-                Spannable spannable = (Spannable) teacherView.getText();
-                if(data.getTeacher().isEmpty()) spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                else spannable.setSpan(new StyleSpan(Typeface.BOLD), data.getTeacher().length()+1, data.getTeacher().length()+1 + data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if(teacherViewSpannable!=null) {
+                if (data.isHighlightTeacher()) {
+                    if (data.getTeacher().isEmpty())
+                        teacherViewSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    else
+                        teacherViewSpannable.setSpan(new StyleSpan(Typeface.BOLD), data.getTeacher().length() + 1, data.getTeacher().length() + 1 + data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    //Spannable spannable = (Spannable) teacherView.getText();
+                    //if(data.getTeacher().isEmpty()) spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    //else spannable.setSpan(new StyleSpan(Typeface.BOLD), data.getTeacher().length()+1, data.getTeacher().length()+1 + data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                teacherView.setText(teacherViewSpannable);
             }
 
 
 
-
+            Spannable subjectSpannable;
             if(!data.getSubject().isEmpty()){
-                subjectView.setText(data.getSubject() + ' ' + data.getSubSubject(), TextView.BufferType.SPANNABLE);
-                Spannable spannable = (Spannable) subjectView.getText();
-                spannable.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                subjectSpannable = new SpannableString(data.getSubject() + ' ' + data.getSubSubject());
+                subjectSpannable.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                //subjectView.setText(data.getSubject() + ' ' + data.getSubSubject(), TextView.BufferType.SPANNABLE);
+                //Spannable spannable = (Spannable) subjectView.getText();
+                //spannable.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 if(data.isHighlightSubject()){
-                    spannable.setSpan(new StyleSpan(Typeface.BOLD), data.getSubject().length()+1, data.getSubject().length()+1+data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    subjectSpannable.setSpan(new StyleSpan(Typeface.BOLD), data.getSubject().length()+1, data.getSubject().length()+1+data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
             else{
-                subjectView.setText(data.getSubSubject());
+                subjectSpannable = new SpannableString(data.getSubSubject());
+                //subjectView.setText(data.getSubSubject());
                 if(data.isHighlightSubject()){
-                    Spannable spannable = (Spannable) subjectView.getText();
-                    spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    subjectSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
+            subjectView.setText(subjectSpannable);
 
 
 
