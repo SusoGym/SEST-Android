@@ -52,7 +52,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode getAmountOfCommits().toInteger()
-        versionName "0.2.2"
+        versionName "0.2.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

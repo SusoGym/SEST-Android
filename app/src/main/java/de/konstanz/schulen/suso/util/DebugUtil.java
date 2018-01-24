@@ -45,20 +45,21 @@ public class DebugUtil {
     }
 
     public static String censor(String msg) {
-        String pwd = DownloadManager.getInstance().getPassword();
-        if (pwd == null) {
-            pwd = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_PASSWORD, null);
-        }
-        if (pwd == null) {
-            return msg;
-        }
+        if(DownloadManager.getInstance() != null) {
+            String pwd = DownloadManager.getInstance().getPassword();
+            if (pwd == null) {
+                pwd = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_PASSWORD, null);
+            }
+            if (pwd == null) {
+                return msg;
+            }
 
-        try{
-            msg = msg.replaceAll(Pattern.quote(pwd), Matcher.quoteReplacement("<pwd>")).replaceAll(URLEncoder.encode(pwd, "UTF-8"), Matcher.quoteReplacement("<pwd>"));
-        }catch (Exception e){
-            e.printStackTrace();
+            try {
+                msg = msg.replaceAll(Pattern.quote(pwd), Matcher.quoteReplacement("<pwd>")).replaceAll(URLEncoder.encode(pwd, "UTF-8"), Matcher.quoteReplacement("<pwd>"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
         return msg;
     }
 
