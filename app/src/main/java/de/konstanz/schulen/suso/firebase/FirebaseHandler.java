@@ -3,6 +3,7 @@ package de.konstanz.schulen.suso.firebase;
 import android.content.Context;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -69,8 +70,9 @@ public class FirebaseHandler {
     }
 
 
-    public void startup(final Context ctx) {
+    public void startup() {
         if (FirebaseInstanceId.getInstance().getToken() != null) {
+            Crashlytics.setString("fcm_token", FirebaseInstanceId.getInstance().getToken());
             DebugUtil.infoLog(TAG, "Firebase-Token is: " + FirebaseInstanceId.getInstance().getToken());
             token = FirebaseInstanceId.getInstance().getToken();
 
@@ -82,7 +84,9 @@ public class FirebaseHandler {
                         boolean registered = isRegistered(token);
                         boolean validLogin = DownloadManager.getInstance().isLoggedIn();
                         DebugUtil.infoLog(TAG, "Token registered: " + registered + "; Valid login: " + validLogin);
+                        Crashlytics.setBool("fcm_token_registered", registered);
                         if (!registered && validLogin) {
+                            Crashlytics.setInt("fcm_token_register_process_state", 0);
                             registerToken();
                         }
                     } catch (Exception e) {
@@ -116,8 +120,10 @@ public class FirebaseHandler {
 
                         String verification1 = sendRegisterRequest(userId, userType, token);
                         DebugUtil.infoLog(TAG, "Verification Code 1: " + verification1);
+                        Crashlytics.setInt("fcm_token_register_process_state", 1);
                         while (registerVerification2 == null) ;
                         DebugUtil.infoLog(TAG, "Verification Code 2: " + registerVerification2);
+                        Crashlytics.setInt("fcm_token_register_process_state", 2);
 
                         DebugUtil.infoLog(TAG, "Sending verification request with verify1: " + verification1 + " / verify2: " + registerVerification2);
                         success = sendRegisterToken(userId, userType, token, verification1, registerVerification2);
@@ -125,6 +131,8 @@ public class FirebaseHandler {
                     }
 
                     Log.i(TAG, "Successfully registered this device with userId " + userId + " of type " + userType);
+                    Crashlytics.setInt("fcm_token_register_process_state", 3);
+                    Crashlytics.setBool("fcm_token_registered", true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

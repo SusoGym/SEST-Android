@@ -23,6 +23,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.CustomEvent;
 
 import org.json.JSONArray;
@@ -45,6 +46,7 @@ import de.konstanz.schulen.suso.util.DebugUtil;
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 import lombok.Getter;
+import lombok.ToString;
 
 import static de.konstanz.schulen.suso.util.SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA;
 
@@ -279,6 +281,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
     }
 
 
+    @ToString
     private static class SubstitutionData {
         @Getter
         private String subject, teacher, subTeacher, subSubject, subRoom, classes, comment, hour;
@@ -383,20 +386,19 @@ public class SubstitutionplanFragment extends AbstractFragment {
         }
 
         private void initialize(SubstitutionData data) {
+            Crashlytics.setString("substitutionData", data.toString());
             hourView.setText(data.getHour());
 
             Spannable teacherViewSpannable = null;
 
             if (displayTeacherName(data)) {
                 if (!data.getTeacher().isEmpty()) {
-                    System.out.println("teacher ne");
                     teacherViewSpannable = new SpannableString(data.getTeacher() + ' ' + data.getSubTeacher());
                     teacherViewSpannable.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 } else {
                     teacherViewSpannable = new SpannableString(data.getSubTeacher());
                 }
             } else if (!data.subTeacher.isEmpty()) {
-                System.out.println("no display teacher");
                 teacherViewSpannable = new SpannableString(data.getSubTeacher());
             } else {
                 table.removeView(table.findViewById(R.id.substitution_card_teacher_row));
@@ -407,11 +409,6 @@ public class SubstitutionplanFragment extends AbstractFragment {
                     if (data.getTeacher().isEmpty() || !displayTeacherName(data)) {
                         teacherViewSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     } else {
-                        System.out.println(teacherViewSpannable);
-                        System.out.println(teacherViewSpannable.length());
-                        System.out.println(data.getTeacher());
-                        System.out.println(data.getSubTeacher());
-                        System.out.println(data.getTeacher().length() + 1 + data.getSubTeacher().length());
                         teacherViewSpannable.setSpan(new StyleSpan(Typeface.BOLD), data.getTeacher().length() + 1, data.getTeacher().length() + 1 + data.getSubTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 }
@@ -423,15 +420,11 @@ public class SubstitutionplanFragment extends AbstractFragment {
             if (!data.getSubject().isEmpty()) {
                 subjectSpannable = new SpannableString(data.getSubject() + ' ' + data.getSubSubject());
                 subjectSpannable.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                //subjectView.setText(data.getSubject() + ' ' + data.getSubSubject(), TextView.BufferType.SPANNABLE);
-                //Spannable spannable = (Spannable) subjectView.getText();
-                //spannable.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 if (data.isHighlightSubject()) {
                     subjectSpannable.setSpan(new StyleSpan(Typeface.BOLD), data.getSubject().length() + 1, data.getSubject().length() + 1 + data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             } else {
                 subjectSpannable = new SpannableString(data.getSubSubject());
-                //subjectView.setText(data.getSubSubject());
                 if (data.isHighlightSubject()) {
                     subjectSpannable.setSpan(new StyleSpan(Typeface.BOLD), 0, data.getSubSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
@@ -439,50 +432,22 @@ public class SubstitutionplanFragment extends AbstractFragment {
             subjectView.setText(subjectSpannable);
 
 
-            if (data.getSubRoom() != "") roomView.setText(data.getSubRoom());
-            else table.removeView(table.findViewById(R.id.substitution_card_room_row));
-
-            commentView.setText(data.getComment());
-
-
-
-
-            /*hourView.setText(data.getHour());
-            //teacherView.setText(data.getTeacher() + " " + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
-            subjectView.setText(data.getSubject() + data.getSubSubject(), TextView.BufferType.SPANNABLE);
-            if (data.getSubRoom().isEmpty()) {
-                roomLayout.setVisibility(View.INVISIBLE);
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.BELOW, R.id.substitution_layout_subject);
-                commentLayout.setLayoutParams(params);
-            } else {
+            if (!data.getSubRoom().equals("")) {
                 roomView.setText(data.getSubRoom());
+            } else {
+                table.removeView(table.findViewById(R.id.substitution_card_room_row));
             }
             commentView.setText(data.getComment());
 
-            if (!data.getSubTeacher().isEmpty()) {
-                if(displayTeacherName(data)) {
-                    teacherView.setText(data.getTeacher() + data.getSubTeacher(), TextView.BufferType.SPANNABLE);
-                    Spannable span = (Spannable) teacherView.getText();
-                    span.setSpan(new StrikethroughSpan(), 0, data.getTeacher().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                }else{
-                    teacherView.setText(data.getSubTeacher(), TextView.BufferType.SPANNABLE);
-                }
-            }
-
-            if (!data.getSubTeacher().isEmpty()) {
-                Spannable span = (Spannable) subjectView.getText();
-                span.setSpan(new StrikethroughSpan(), 0, data.getSubject().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }*/
+            Crashlytics.setString("substitutionData", "");
         }
 
         private boolean displayTeacherName(SubstitutionData data) {
-            if (data.getClasses().equalsIgnoreCase("11") || data.getClasses().equalsIgnoreCase("12")
+            return (data.getClasses().equalsIgnoreCase("11") || data.getClasses().equalsIgnoreCase("12")
                     || data.getSubject().equalsIgnoreCase("ev") || data.getSubject().equalsIgnoreCase("rk")
                     || data.getSubject().equalsIgnoreCase("sp") || data.getSubject().equalsIgnoreCase("nwt")
-                    || data.getSubject().equalsIgnoreCase("f") || data.getSubject().equalsIgnoreCase("or"))
-                return true;
-            return false;
+                    || data.getSubject().equalsIgnoreCase("f") || data.getSubject().equalsIgnoreCase("or"));
+
         }
     }
 

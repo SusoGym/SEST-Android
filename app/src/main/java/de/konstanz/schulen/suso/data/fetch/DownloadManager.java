@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.api.credentials.Credential;
 
 import org.json.JSONException;
@@ -50,6 +51,7 @@ public class DownloadManager {
         String username = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_USERNAME, null);
         String password = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_PASSWORD, null);
         if (username != null && password != null) {
+            Crashlytics.setString("username", username);
             loginSync(context, username, password);
         }
     }
@@ -85,9 +87,12 @@ public class DownloadManager {
     private int loginSync(Context context, @NonNull final String username, @NonNull final String password) {
         SubstitutionplanFetcher.SubstitutionplanResponse response = SubstitutionplanFetcher.fetch(context, username, password);
 
+        Crashlytics.setInt("loginResponseCode", response.getErrorCode());
+        Crashlytics.setString("loginResponse", response.getData());
         if (response.getErrorCode() == SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR) {
             this.username = username;
             this.password = password;
+            Crashlytics.setUserName(username);
             saveToSharedPreferences();
             SharedPreferencesManager.getSharedPreferences().edit().putString(SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA, response.getData()).commit();
 
@@ -104,6 +109,9 @@ public class DownloadManager {
                 }
                 this.accountInformation = new AccountInformation(accountType, accountId, name, surname, className);
 
+                Crashlytics.setInt("accountType", accountType);
+                Crashlytics.setUserIdentifier(accountId+"");
+                Crashlytics.setString("class", className);
 
             } catch (JSONException e) {
                 DebugUtil.errorLog(TAG, "Invalid substitution data Json (should be fine)");

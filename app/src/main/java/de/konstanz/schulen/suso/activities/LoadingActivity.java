@@ -53,7 +53,7 @@ public class LoadingActivity extends AppCompatActivity implements
         de.konstanz.schulen.suso.data.fetch.DownloadManager.initializeInstance(this);
 
         FirebaseHandler.getInstance().setEndPoint(SusoApplication.API_ENDPOINT);
-        FirebaseHandler.getInstance().startup(this);
+        FirebaseHandler.getInstance().startup();
 
         Class targetClass;
 
