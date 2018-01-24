@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import de.konstanz.schulen.suso.R;
+import de.konstanz.schulen.suso.SusoApplication;
 import de.konstanz.schulen.suso.data.fetch.DownloadManager;
 import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.DebugUtil;
@@ -21,7 +22,6 @@ import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 public class LoadingActivity extends AppCompatActivity implements
         Runnable {
     private static final String TAG = LoadingActivity.class.getSimpleName();
-    public static String API_ENDPOINT = null;
 
     private ProgressBar spinner;
 
@@ -29,6 +29,7 @@ public class LoadingActivity extends AppCompatActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+
 
         Thread welcomeThread = new Thread(this);
         checkForPlayServices(welcomeThread);
@@ -47,11 +48,12 @@ public class LoadingActivity extends AppCompatActivity implements
 
     @Override
     public void run() {
+
+
         de.konstanz.schulen.suso.data.fetch.DownloadManager.initializeInstance(this);
 
-        FirebaseHandler.getInstance().setEndPoint(API_ENDPOINT);
+        FirebaseHandler.getInstance().setEndPoint(SusoApplication.API_ENDPOINT);
         FirebaseHandler.getInstance().startup(this);
-
 
         Class targetClass;
 

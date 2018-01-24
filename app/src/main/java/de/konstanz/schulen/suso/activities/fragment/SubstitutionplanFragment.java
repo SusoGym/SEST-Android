@@ -68,7 +68,7 @@ public class SubstitutionplanFragment extends AbstractFragment {
     @Override
     public void onPushToForeground() {
 
-        DebugUtil.errorLog(TAG, "Pushing to foreground");
+        DebugUtil.infoLog(TAG, "Pushing to foreground");
         showSubstitutionplan();
     }
 
@@ -136,10 +136,10 @@ public class SubstitutionplanFragment extends AbstractFragment {
 
         String savedSubstitutionplanData = SharedPreferencesManager.getSharedPreferences().getString(SHR_SUBSITUTIONPLAN_DATA, null);
         if (savedSubstitutionplanData != null) {
-            DebugUtil.errorLog(TAG, savedSubstitutionplanData);
+            DebugUtil.infoLog(TAG, savedSubstitutionplanData);
             displaySubstitutionplan(savedSubstitutionplanData);
         }
-        DebugUtil.errorLog(TAG, "Updating substitution plan");
+        DebugUtil.infoLog(TAG, "Updating substitution plan");
         updateSubstitutionplan();
     }
 

@@ -20,6 +20,7 @@ public class IOUtility {
         while ((temp = is.readLine()) != null) {
             data.append(temp);
         }
+        DebugUtil.debugLog(TAG, "Response: " + data.toString());
         return data.toString();
     }
 

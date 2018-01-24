@@ -26,25 +26,30 @@ public class DownloadManager {
 
     private static DownloadManager instance;
 
-    public static DownloadManager getInstance(){
+    public static DownloadManager getInstance() {
         return instance;
     }
 
-    public static DownloadManager initializeInstance(Context context){
-        return instance = new DownloadManager(context);
+    public static DownloadManager initializeInstance(Context context) {
+        return new DownloadManager(context);
     }
 
 
-
+    @Getter
     private String username = null, password = null;
     @Getter
     private AccountInformation accountInformation = null;
 
 
-    public DownloadManager(Context context){
+    private DownloadManager(Context context) {
+
+        if (instance == null) {
+            instance = this;
+        }
+
         String username = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_USERNAME, null);
         String password = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_PASSWORD, null);
-        if(username!=null && password!=null) {
+        if (username != null && password != null) {
             loginSync(context, username, password);
         }
     }
@@ -53,17 +58,18 @@ public class DownloadManager {
     /**
      * Checks the given user credentials and fetches the substitution plan as well as general account information
      * The login is performed in a separate thread
+     *
      * @param context
      * @param username
      * @param password
      * @param callback The callback for when the login has completed. The parameter is true if the login was successful
      */
-    public void login(final Context context, @NonNull final String username, @NonNull final String password, @Nullable final Callback<Integer> callback){
-        (new Thread(){
+    public void login(final Context context, @NonNull final String username, @NonNull final String password, @Nullable final Callback<Integer> callback) {
+        (new Thread() {
             @Override
-            public void run(){
+            public void run() {
                 final int errorCode = loginSync(context, username, password);
-                if(callback!=null){
+                if (callback != null) {
                     ThreadHandler.runOnMainThread(new Runnable() {
                         @Override
                         public void run() {
@@ -76,15 +82,14 @@ public class DownloadManager {
     }
 
 
-    private int loginSync(Context context, @NonNull final String username, @NonNull final String password){
+    private int loginSync(Context context, @NonNull final String username, @NonNull final String password) {
         SubstitutionplanFetcher.SubstitutionplanResponse response = SubstitutionplanFetcher.fetch(context, username, password);
 
-        if(response.getErrorCode()== SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR) {
+        if (response.getErrorCode() == SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR) {
             this.username = username;
             this.password = password;
             saveToSharedPreferences();
             SharedPreferencesManager.getSharedPreferences().edit().putString(SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA, response.getData()).commit();
-
 
 
             try {
@@ -100,8 +105,8 @@ public class DownloadManager {
                 this.accountInformation = new AccountInformation(accountType, accountId, name, surname, className);
 
 
-            }catch(JSONException e){
-                DebugUtil.errorLog(TAG, e.getMessage());
+            } catch (JSONException e) {
+                DebugUtil.errorLog(TAG, "Invalid substitution data Json (should be fine)");
             }
 
 
@@ -110,15 +115,15 @@ public class DownloadManager {
     }
 
 
-    public boolean isLoggedIn(){
-        return username!=null;
+    public boolean isLoggedIn() {
+        return username != null;
     }
 
-    public Credential getCredentials(){
+    public Credential getCredentials() {
         return new Credential.Builder(this.username).setPassword(this.password).build();
     }
 
-    public void logout(){
+    public void logout() {
         Log.i(TAG, "Logging out...");
         username = null;
         password = null;
@@ -128,30 +133,28 @@ public class DownloadManager {
     }
 
 
-
-    public void updateSubstitutionplanData(final Context context, final Callback<SubstitutionplanFetcher.SubstitutionplanResponse> callback){
+    public void updateSubstitutionplanData(final Context context, final Callback<SubstitutionplanFetcher.SubstitutionplanResponse> callback) {
 
         String usernameTemp, passwordTemp;
-        if(this.username==null || this.password==null){
+        if (this.username == null || this.password == null) {
             usernameTemp = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_USERNAME, null);
             passwordTemp = SharedPreferencesManager.getSharedPreferences().getString(SharedPreferencesManager.SHR_PASSWORD, null);
-        }else{
+        } else {
             usernameTemp = this.username;
             passwordTemp = this.password;
         }
 
 
-
         final String username = usernameTemp;
         final String password = passwordTemp;
-        (new Thread(){
+        (new Thread() {
             @Override
-            public void run(){
+            public void run() {
                 final SubstitutionplanFetcher.SubstitutionplanResponse response = SubstitutionplanFetcher.fetch(context, username, password);
                 ThreadHandler.runOnMainThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(response.getErrorCode()== SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR){
+                        if (response.getErrorCode() == SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR) {
                             SharedPreferencesManager.getSharedPreferences().edit().putString(SharedPreferencesManager.SHR_SUBSITUTIONPLAN_DATA, response.getData()).commit();
                         }
                         callback.callback(response);
@@ -162,9 +165,7 @@ public class DownloadManager {
     }
 
 
-
-
-    private void saveToSharedPreferences(){
+    private void saveToSharedPreferences() {
         SharedPreferencesManager.getSharedPreferences().edit()
                 .putString(SharedPreferencesManager.SHR_USERNAME, username)
                 .putString(SharedPreferencesManager.SHR_PASSWORD, password)
@@ -172,16 +173,8 @@ public class DownloadManager {
     }
 
 
-
-
-
-
-
-
-
-
     @AllArgsConstructor
-    public static class AccountInformation{
+    public static class AccountInformation {
         @Getter
         private int accountType, accountId;
         @Getter

@@ -6,7 +6,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import de.konstanz.schulen.suso.firebase.FirebaseHandler;
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
@@ -30,8 +29,7 @@ public class SusoApplication extends Application {
 
         if(testLab != null && testLab.equals("true") || BuildConfig.DEBUG_MODE)
         {
-            FabricHandler.USE_FABRIC = false; // we are in an testing environment
-            Log.i(TAG, "Welcome Testing!");
+            Log.i(TAG, "Welcome Testing! Fabric is disabled...");
         }
 
         FabricHandler.initialize(this);
@@ -49,12 +47,6 @@ public class SusoApplication extends Application {
         }
 
         Log.i(TAG, text.toString());
-
-        //AccountManager.getInstance().loadFromSharedPreferences(this);
-        de.konstanz.schulen.suso.data.fetch.DownloadManager.initializeInstance(this);
-
-        FirebaseHandler.getInstance().setEndPoint(API_ENDPOINT);
-        FirebaseHandler.getInstance().startup(this);
 
         Log.i(TAG, "Successfully started Suso App");
         super.onCreate();

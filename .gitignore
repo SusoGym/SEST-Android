@@ -10,3 +10,4 @@ gradle/
 gradlew.bat
 /gradlew
 keystore.properties
+fabric.properties
