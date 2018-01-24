@@ -20,3 +20,7 @@
 -keep public class SmartLockHandler
 -keep public class SubstitutionplanFetcher
 -keep public class Callback
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**
