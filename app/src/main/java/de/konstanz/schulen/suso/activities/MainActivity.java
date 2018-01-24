@@ -86,9 +86,19 @@ public class MainActivity extends AppCompatActivity
 
         AbstractFragment.setMasterActivity(this);
 
+
+
+
     }
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        //Add the view fragment
+        setActiveFragment(SubstitutionplanFragment.class);
+        navigationView.setCheckedItem(currentFragment.getNavigationId());
+        disableUnknownNavItems();
+    }
 
     @Override
     protected void onResume() {
@@ -146,17 +156,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
 
-        //Add the view fragment
-        setActiveFragment(SubstitutionplanFragment.class);
-
-        navigationView.setCheckedItem(currentFragment.getNavigationId());
-
-        disableUnknownNavItems();
-    }
 
 
     @Override
