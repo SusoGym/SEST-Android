@@ -7,6 +7,7 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.crashlytics.android.answers.LoginEvent;
 
+import de.konstanz.schulen.suso.SusoApplication;
 import io.fabric.sdk.android.BuildConfig;
 import io.fabric.sdk.android.Fabric;
 
@@ -23,6 +24,12 @@ public class FabricHandler {
         if (!BuildConfig.DEBUG) {
             Fabric.with(fabric);
         }
+
+        if(SusoApplication.TESTING)
+        {
+            Crashlytics.setBool("testlab", true);
+        }
+
     }
 
     public static void logCustomEvent(CustomEvent event) {

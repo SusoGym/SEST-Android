@@ -33,10 +33,6 @@ public class SusoApplication extends Application {
         if(testLab != null && testLab.equals("true") || BuildConfig.DEBUG_MODE)
         {
             TESTING = testLab != null && testLab.equals("true");
-            if(TESTING)
-            {
-                Crashlytics.setBool("testlab", true);
-            }
             Log.i(TAG, "Welcome Testing! Fabric is disabled...");
         }
 
