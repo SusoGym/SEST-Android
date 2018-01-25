@@ -235,6 +235,12 @@ public class SmartLockHandler implements GoogleApiClient.OnConnectionFailedListe
                 .build();
 
 
+        if(!mCredentialsApiClient.isConnected())
+        {
+            DebugUtil.errorLog(TAG, "Did not save login to SmartLock, as google api was not connected yet!");
+            return;
+        }
+
         // NOTE: this method unconditionally saves the Credential built, even if all the fields
         // are blank or it is invalid in some other way.  In a real application you should contact
         // your app's back end and determine that the credential is valid before saving it to the
