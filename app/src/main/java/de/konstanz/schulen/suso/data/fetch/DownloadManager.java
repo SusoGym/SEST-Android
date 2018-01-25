@@ -88,7 +88,6 @@ public class DownloadManager {
         SubstitutionplanFetcher.SubstitutionplanResponse response = SubstitutionplanFetcher.fetch(context, username, password);
 
         Crashlytics.setInt("loginResponseCode", response.getErrorCode());
-        Crashlytics.setString("loginResponse", response.getData());
         if (response.getErrorCode() == SubstitutionplanFetcher.SubstitutionplanResponse.NO_ERROR) {
             this.username = username;
             this.password = password;

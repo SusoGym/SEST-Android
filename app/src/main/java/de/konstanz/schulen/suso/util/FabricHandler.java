@@ -20,7 +20,9 @@ public class FabricHandler {
                 .debuggable(BuildConfig.DEBUG)
                 .build();
 
-        Fabric.with(fabric);
+        if (!BuildConfig.DEBUG) {
+            Fabric.with(fabric);
+        }
     }
 
     public static void logCustomEvent(CustomEvent event) {

@@ -21,6 +21,7 @@ import com.google.android.gms.common.api.ResolvingResultCallbacks;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import de.konstanz.schulen.suso.SusoApplication;
 import de.konstanz.schulen.suso.util.Callback;
 import de.konstanz.schulen.suso.util.DebugUtil;
 
@@ -223,6 +224,11 @@ public class SmartLockHandler implements GoogleApiClient.OnConnectionFailedListe
 
 
     public void saveCredential(String user, String pwd) {
+
+        if(SusoApplication.TESTING)
+        {
+            return; // usually gets stuck here...
+        }
         DebugUtil.infoLog(TAG, "Saving Credential:" + user);
         final Credential credential = new Credential.Builder(user)
                 .setPassword(pwd)

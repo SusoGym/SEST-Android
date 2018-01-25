@@ -6,6 +6,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import de.konstanz.schulen.suso.util.FabricHandler;
 import de.konstanz.schulen.suso.util.SharedPreferencesManager;
 
@@ -14,6 +16,7 @@ public class SusoApplication extends Application {
     public static final String TAG = SusoApplication.class.getSimpleName();
     public static String API_ENDPOINT = null;
 
+    public static boolean TESTING = false;
 
 
     @Override
@@ -29,6 +32,11 @@ public class SusoApplication extends Application {
 
         if(testLab != null && testLab.equals("true") || BuildConfig.DEBUG_MODE)
         {
+            TESTING = testLab != null && testLab.equals("true");
+            if(TESTING)
+            {
+                Crashlytics.setBool("testlab", true);
+            }
             Log.i(TAG, "Welcome Testing! Fabric is disabled...");
         }
 
